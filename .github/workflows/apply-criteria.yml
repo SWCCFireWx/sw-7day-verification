@@ -1,0 +1,76 @@
+name: Apply criteria from website
+
+# The website's Criteria tab opens an issue titled "[criteria] ..." with the new
+# settings. This workflow checks them, saves config/criteria.json, re-checks all
+# saved days, commits, replies on the issue and closes it.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: archive          # never run at the same time as the nightly archive
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: startsWith(github.event.issue.title, '[criteria]')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - name: Only allow people with write access
+        if: ${{ !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) }}
+        run: |
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "Criteria can only be changed by people with write access to this repository. Nothing was changed."
+          gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY"
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check and save the new criteria
+        id: apply
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python scripts/apply_criteria.py
+
+      - name: Re-check saved days with the new criteria
+        id: rescore
+        continue-on-error: true
+        run: python scripts/verify_weather.py --rescore --days 0
+
+      - name: Commit
+        run: |
+          git config user.name  "forecast-archiver"
+          git config user.email "actions@users.noreply.github.com"
+          git add config/criteria.json data/
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "Update criteria from website (issue #$ISSUE)"
+            git pull --rebase --quiet
+            git push
+          fi
+
+      - name: Reply and close
+        if: always()
+        run: |
+          [ -f criteria_result.md ] || echo "**Not applied.** Something went wrong; see the Actions tab for details." > criteria_result.md
+          if [ "${{ steps.apply.outcome }}" = "success" ]; then
+            if [ "${{ steps.rescore.outcome }}" = "success" ]; then
+              echo "- All saved days were re-checked with these criteria." >> criteria_result.md
+            else
+              echo "- The criteria were saved, but re-checking past days failed. Run the nightly workflow with **rescore** checked to retry." >> criteria_result.md
+            fi
+          fi
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body-file criteria_result.md
+          gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY"
