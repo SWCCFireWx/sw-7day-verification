@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SW 7-Day Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f4ef; --panel: #ffffff; --ink: #1f2420; --muted: #646b64; --line: #dcd8cf;
+    --accent: #b5451b;
+    --good: #2f7d3a; --warn: #b5451b; --info: #3d6aa8;
+    /* product colors, matching the official 7-day map */
+    --green: #5fb336; --yellow: #ffff40; --brown: #d9b46f;
+    --orange: #ff8c00; --red: #e81e1e; --gray: #b4b4b4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161816; --panel: #1f221f; --ink: #e8e6e0; --muted: #9aa09a; --line: #343834;
+      --accent: #e0703f; --good: #6cc27a; --warn: #e0703f; --info: #7fa6dd;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161816; --panel: #1f221f; --ink: #e8e6e0; --muted: #9aa09a; --line: #343834;
+    --accent: #e0703f; --good: #6cc27a; --warn: #e0703f; --info: #7fa6dd;
+  }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  #themeBtn { flex: none; display: inline-flex; align-items: center; gap: 6px; font: 500 13px "IBM Plex Sans", sans-serif;
+              background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 999px;
+              padding: 6px 12px; cursor: pointer; }
+  #themeBtn:hover { border-color: var(--muted); }
+  #themeBtn svg { width: 15px; height: 15px; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 "IBM Plex Sans", system-ui, sans-serif; }
+  header { padding: 22px 16px 10px; max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0; font-weight: 600; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  nav { max-width: 1180px; margin: 8px auto 0; padding: 0 16px; display: flex; gap: 4px; flex-wrap: wrap;
+        border-bottom: 1px solid var(--line); }
+  nav button { background: none; border: 0; padding: 9px 14px; font: inherit; color: var(--muted);
+               cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  nav button.on { color: var(--ink); border-color: var(--accent); font-weight: 500; }
+  main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 60px; }
+  section { display: none; } section.on { display: block; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .row { display: flex; gap: 10px 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  label { font-size: 13px; color: var(--muted); }
+  select, input { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px;
+                  background: var(--panel); color: var(--ink); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 0; text-align: center; }
+  th { font-weight: 500; color: var(--muted); padding: 4px 6px; white-space: nowrap; }
+  th.l, td.l { text-align: left; padding-right: 10px; font-family: "IBM Plex Mono", monospace; font-size: 12.5px; white-space: nowrap; }
+  td.c { width: 52px; height: 32px; border: 2px solid var(--panel); border-radius: 4px; position: relative;
+         font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600; color: #1f2420; }
+  td.c.fire::after { content: ""; position: absolute; right: 4px; top: 4px; width: 9px; height: 9px;
+                     border-radius: 50%; background: #111; box-shadow: 0 0 0 2px #fff; }
+  td.c .ob { position: absolute; left: 3px; bottom: 2px; font-size: 9.5px; font-weight: 600; line-height: 1;
+             background: #111; color: #fff; padding: 1px 3px; border-radius: 3px; }
+  .k-1 { background: var(--green); } .k-2 { background: var(--yellow); } .k-3 { background: var(--brown); }
+  .k-0 { background: var(--gray); } .k-W, .k-B, .k-WB { background: var(--orange); } .k-L { background: var(--red); color: #fff !important; }
+  .k-none { background: transparent; border: 2px dashed var(--line) !important; }
+  .legend { display: flex; gap: 8px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 16px; height: 16px; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center;
+        font: 600 10px "IBM Plex Mono", monospace; color: #1f2420; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #111; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--line); }
+  .obk { font: 600 9.5px "IBM Plex Mono", monospace; background: #111; color: #fff; padding: 1px 3px; border-radius: 3px;
+         box-shadow: 0 0 0 1px var(--muted); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 24px; font-weight: 600; font-family: "IBM Plex Mono", monospace; }
+  .stat small { color: var(--muted); font-size: 12px; }
+  table.num td, table.num th { padding: 6px 10px; border-bottom: 1px solid var(--line); font-family: "IBM Plex Mono", monospace; }
+  table.num th { font-family: inherit; }
+  table.num td:first-child, table.num th:first-child { text-align: left; font-family: inherit; }
+  table.list td, table.list th { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  table.list td { font-size: 12.5px; }
+  table.list td.m { font-family: "IBM Plex Mono", monospace; white-space: nowrap; }
+  .tag { display: inline-block; font: 600 11px "IBM Plex Mono", monospace; padding: 2px 6px; border-radius: 4px; }
+  .bar { height: 8px; background: var(--accent); border-radius: 4px; display: inline-block; vertical-align: middle; }
+  .note { font-size: 13px; color: var(--muted); }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+  code { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+  h2 { font-size: 16px; margin: 0 0 4px; font-weight: 600; }
+  h3 { font-size: 14px; margin: 20px 0 8px; font-weight: 600; }
+  .good { color: var(--good); } .warn { color: var(--warn); } .info { color: var(--info); }
+  /* criteria editor */
+  .btn { font: 500 13px "IBM Plex Sans", sans-serif; background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+         border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  .btn:hover { border-color: var(--muted); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.small { padding: 3px 9px; font-size: 12px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .sets { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin: 12px 0 14px; }
+  .set { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--bg); }
+  .set.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .set .hd { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .set .hd input { flex: 1; font-weight: 600; min-width: 0; }
+  .set .desc { width: 100%; font-size: 12.5px; margin-bottom: 8px; }
+  .set h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 10px 0 4px; font-weight: 600; }
+  .fld { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+  .fld > span:first-child { flex: 1; }
+  .fld > span:last-child { flex: none; white-space: nowrap; }
+  .fld input { width: 74px; text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 13px; padding: 3px 6px; }
+  .fld input.changed { border-color: var(--accent); }
+  .badge { font: 600 10.5px "IBM Plex Sans", sans-serif; text-transform: uppercase; letter-spacing: .04em; color: #fff;
+           background: var(--accent); border-radius: 4px; padding: 2px 6px; }
+  .tpm { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px 14px; margin-top: 10px; }
+  .tpm label { display: flex; justify-content: space-between; align-items: center; font: 13px "IBM Plex Mono", monospace; color: var(--ink); }
+  .tpm input { width: 64px; text-align: right; font-family: "IBM Plex Mono", monospace; padding: 3px 6px; }
+  .savebar { position: sticky; bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+             box-shadow: 0 4px 18px rgba(0,0,0,.12); }
+  .savebar.clean { position: static; box-shadow: none; }
+  .err { color: var(--warn); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Southwest 7-Day Significant Fire Potential &mdash; Verification</h1>
+    <div class="sub" id="status">Loading archive&hellip;</div>
+  </div>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark mode"></button>
+</header>
+<script>
+  // apply saved theme before the page paints
+  (function () {
+    var t = null; try { t = localStorage.getItem("theme"); } catch (e) {}
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<nav>
+  <button data-tab="forecast" class="on">Forecast archive</button>
+  <button data-tab="evolution">Forecast evolution</button>
+  <button data-tab="weather">Weather check</button>
+  <button data-tab="score">Scorecard</button>
+  <button data-tab="criteria">Criteria</button>
+  <button data-tab="about">How it works</button>
+</nav>
+<main>
+
+<section id="forecast" class="on">
+  <div class="card">
+    <div class="row">
+      <label for="issueSel">Issued</label>
+      <select id="issueSel"></select>
+      <span class="note">Black tags show High Risk triggers observed that day. Dots mark recorded fires.</span>
+    </div>
+    <div class="scroll"><table id="issueGrid"></table></div>
+    <div class="legend legendBox"></div>
+  </div>
+</section>
+
+<section id="evolution">
+  <div class="card">
+    <h2>How the forecast for each day changed as it got closer</h2>
+    <p class="note">Each row is a target date. Reading left to right shows what was forecast 7 days out, 6 days out, and so on down to Day 1.</p>
+    <div class="row">
+      <label for="psaSel">PSA</label>
+      <select id="psaSel"></select>
+      <label for="evoRange">Show</label>
+      <select id="evoRange">
+        <option value="21">last 3 weeks</option>
+        <option value="60">last 2 months</option>
+        <option value="3650">everything</option>
+      </select>
+    </div>
+    <div class="scroll"><table id="evoGrid"></table></div>
+    <div class="legend legendBox"></div>
+  </div>
+</section>
+
+<section id="weather">
+  <div class="card">
+    <h2>Did observed weather meet the High Risk criteria?</h2>
+    <p class="note">Compares each PSA's forecast with what RAWS and soundings showed that day, using the criteria set in use that day. A PSA counts when a few stations hit the criteria, not the PSA average. Lightning comes only from days you confirm in <code>data/lightning.csv</code>.</p>
+    <div class="row">
+      <label for="wxLead">Forecast</label>
+      <select id="wxLead">
+        <option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option>
+        <option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option><option value="7">Day 7</option>
+      </select>
+      <label for="wxFrom">From</label><input id="wxFrom" type="date">
+      <label for="wxTo">to</label><input id="wxTo" type="date">
+      <label for="wxPsa">PSA</label><select id="wxPsa"><option value="">All</option></select>
+    </div>
+    <div id="wxBody"></div>
+  </div>
+</section>
+
+<section id="score">
+  <div class="card">
+    <div class="row">
+      <label for="evtDef">Count a forecast &ldquo;yes&rdquo; when</label>
+      <select id="evtDef">
+        <option value="hr">High Risk (W, B or L)</option>
+        <option value="hrvd">High Risk or Moderate Risk</option>
+      </select>
+      <label for="obsDef">Verify against</label>
+      <select id="obsDef">
+        <option value="fire">Significant fires</option>
+        <option value="wx">Observed High Risk weather</option>
+        <option value="either">Fire or High Risk weather</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="minAcres">Fires of at least</label>
+      <input id="minAcres" type="number" min="0" value="0" style="width:90px"> <label>acres</label>
+      <label for="scoreFrom">From</label><input id="scoreFrom" type="date">
+      <label for="scoreTo">to</label><input id="scoreTo" type="date">
+    </div>
+    <div id="scoreBody"></div>
+  </div>
+</section>
+
+<section id="criteria">
+  <div class="card" id="crNow"></div>
+  <div class="card">
+    <h2>Criteria sets</h2>
+    <p class="note">Each set is a complete list of thresholds. Edit the numbers, rename a set, or add a new one. Switch which set is in use above.</p>
+    <div id="crSets"></div>
+    <button type="button" class="btn" id="crAddSet">+ New set</button>
+  </div>
+  <div class="card">
+    <h2>Typical peak-season max temperature by PSA</h2>
+    <p class="note">Used by Burn Environment (&ldquo;temperatures much above typical peak fire season max&rdquo;). Leave blank to estimate from each station's elevation.</p>
+    <div id="crTpm" class="tpm"></div>
+  </div>
+  <div class="card savebar" id="crSave"></div>
+</section>
+
+<section id="about">
+  <div class="card">
+    <h2>What this page is</h2>
+    <p>Every evening a GitHub Action saves the Southwest PSAs from the national 7-Day Significant Fire Potential (all seven days) to <code>data/forecasts.csv</code>. It then checks the previous day's observed weather against the Wind and Burn Environment criteria in use that day and saves the result to <code>data/observed.csv</code>. Lightning is confirmed by hand.</p>
+
+    <h3>Forecast categories</h3>
+    <div class="legend legendBox" style="margin-top:0"></div>
+
+    <h3>How observed High Risk is decided</h3>
+    <p>Each RAWS station is checked on its own. A PSA meets a trigger when enough stations hit it, not the PSA average.</p>
+    <ul>
+      <li><b>Wind (W):</b> an hour with sustained wind at or above the limit and RH at or below the limit, or several hours of gusts at or above the gust limit with low RH.</li>
+      <li><b>Burn Environment (B):</b> afternoon max temperature well above the typical peak-season max with low RH, plus elevated instability (high-elevation Haines from the nearest 00Z sounding). Typical peak-season max is estimated from station elevation unless a PSA value is set. <b>B?</b> means the station part was met but no sounding was available.</li>
+      <li><b>Lightning (L):</b> confirmed by hand. Add a row to <code>data/lightning.csv</code> for each PSA-day you confirm. The Weather check tab lists Lightning forecasts waiting for review with the number of dry stations as context.</li>
+    </ul>
+    <h3>Changing the criteria</h3>
+    <p>Use the <b>Criteria</b> tab. You can keep several named sets (for example &ldquo;Standard&rdquo; and &ldquo;Hot season&rdquo;) and switch which one is in use, starting on any date you choose. Each day is checked with the set that was in use that day, so earlier results keep their original criteria unless you edit that set.</p>
+    <p>Saving opens GitHub with your changes filled in; click <b>Submit new issue</b> there. An automatic step checks the numbers, saves them, re-checks past days, and replies on that issue. The site updates within a few minutes.</p>
+    <p class="note">The Little/Low/Moderate risk levels depend on fuels (ERC and other indices), so the weather check covers the High Risk triggers only.</p>
+
+    <h3>Confirming lightning</h3>
+    <p>Edit <code>data/lightning.csv</code> on GitHub (open the file, pencil icon, commit). One row per PSA-day:</p>
+    <p><code>date,psa,notes</code><br><code>2026-07-14,SW05,scattered dry storms, RH 12-18%</code></p>
+
+    <h3>Adding fires</h3>
+    <p>Fire occurrence comes from <code>data/fires.csv</code>. Add one row per significant fire with the discovery date (Mountain time) and its PSA:</p>
+    <p><code>date,psa,fire_name,acres,cause,notes</code><br><code>2026-11-05,SW05,Example Fire,1250,Lightning,</code></p>
+
+    <h3>Scores</h3>
+    <ul>
+      <li><b>POD</b>: share of event days that were forecast &ldquo;yes&rdquo;. Higher is better.</li>
+      <li><b>FAR</b>: share of &ldquo;yes&rdquo; forecasts with no event. Lower is better.</li>
+      <li><b>CSI</b>: hits &divide; (hits + misses + false alarms). Higher is better.</li>
+      <li><b>Bias</b>: &ldquo;yes&rdquo; forecasts &divide; event days. Above 1 means over-forecasting.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ------------------------------------------------------------------ categories
+const CAT = {
+  "0": { cls: "k-0", label: "No Data", letter: "" },
+  "1": { cls: "k-1", label: "Little or No Risk", letter: "" },
+  "2": { cls: "k-2", label: "Low Risk", letter: "" },
+  "3": { cls: "k-3", label: "Moderate Risk", letter: "" },
+  "W": { cls: "k-W", label: "High Risk: Wind", letter: "W" },
+  "B": { cls: "k-B", label: "High Risk: Burn Environment", letter: "B" },
+  "L": { cls: "k-L", label: "High Risk: Lightning", letter: "L" },
+  "WB": { cls: "k-WB", label: "High Risk: Wind or Burn (letter not given)", letter: "!" },
+};
+const CAT_ORDER = ["0", "1", "2", "3", "W", "B", "L"];
+const TRIG_NAME = { W: "Wind", B: "Burn Environment", L: "Lightning", WB: "Wind/Burn" };
+
+function trigOf(r) {
+  if (r.trigger) return r.trigger;
+  const s = (r.symbol || "").toUpperCase();
+  if (["W", "B", "L"].includes(s)) return s;
+  if (r.high_risk === "IGNITION") return "L";
+  if (r.high_risk === "CRITICAL") return "WB";
+  return "";
+}
+const keyOf = r => trigOf(r) || r.dryness_code || "0";
+
+// ------------------------------------------------------------------ helpers
+function parseCSV(text) {
+  const rows = []; let row = [], f = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"' && text[i + 1] === '"') { f += '"'; i++; }
+      else if (c === '"') q = false;
+      else f += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(f); f = ""; if (row.some(v => v !== "")) rows.push(row); row = [];
+    } else f += c;
+  }
+  row.push(f); if (row.some(v => v !== "")) rows.push(row);
+  if (!rows.length) return [];
+  const head = rows.shift().map(h => h.trim());
+  return rows.map(r => Object.fromEntries(head.map((h, i) => [h, (r[i] ?? "").trim()])));
+}
+async function getCSV(path) {
+  try { const r = await fetch(path + "?v=" + Date.now()); return r.ok ? parseCSV(await r.text()) : []; }
+  catch { return []; }
+}
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const fmtDay = iso => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const todayMT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Denver" });
+const $ = id => document.getElementById(id);
+
+let FC = [], FIRES = [], OBS = [], LTG = [], CFG = null, ISSUES = [], PSAS = [];
+const byIssue = new Map(), byPsaValidLead = new Map(), fireSet = new Map(), obsMap = new Map();
+
+function legendHTML() {
+  return CAT_ORDER.map(k => `<span><i class="sw ${CAT[k].cls}">${CAT[k].letter}</i>${CAT[k].label}</span>`).join("") +
+    `<span><i class="obk">W</i>Observed trigger</span><span><i class="dot"></i>Significant fire</span>`;
+}
+
+function cell(r, psa, valid, emptyTip) {
+  const fire = fireSet.get(psa + "|" + valid);
+  const ob = obsMap.get(psa + "|" + valid);
+  const obTxt = ob ? (ob.observed || "") + (ob.possible || "") : "";
+  const obTag = obTxt ? `<span class="ob">${esc(obTxt)}</span>` : "";
+  if (!r) return `<td class="c k-none" title="${esc(emptyTip || "no forecast archived")}">${obTag}</td>`;
+  const k = keyOf(r), c = CAT[k] || CAT["0"];
+  const tip = `${psa} · ${valid} · Day ${r.lead_day} (issued ${r.issue_date}) · ${c.label}` +
+    (ob ? ` · Observed: ${obTxt || "no trigger"}` : "") + (fire ? ` · FIRE: ${fire}` : "");
+  return `<td class="c ${c.cls} ${fire ? "fire" : ""}" title="${esc(tip)}">${c.letter === "!" ? "W/B" : c.letter}${obTag}</td>`;
+}
+
+// ------------------------------------------------------------------ forecast views
+function renderIssue() {
+  const issue = $("issueSel").value;
+  const rows = byIssue.get(issue) || [];
+  const dates = [...Array(7)].map((_, i) => addDays(issue, i));
+  const psas = [...new Set(rows.map(r => r.psa))].sort();
+  const idx = new Map(rows.map(r => [r.psa + "|" + r.valid_date, r]));
+  let h = `<tr><th class="l">PSA</th>${dates.map((d, i) => `<th>Day ${i + 1}<br><span class="note">${fmtDay(d)}</span></th>`).join("")}</tr>`;
+  for (const p of psas) h += `<tr><td class="l">${p}</td>${dates.map(d => cell(idx.get(p + "|" + d), p, d)).join("")}</tr>`;
+  $("issueGrid").innerHTML = psas.length ? h : `<tr><td class="empty">No forecast archived for this date.</td></tr>`;
+}
+
+function renderEvolution() {
+  const psa = $("psaSel").value, span = +$("evoRange").value;
+  if (!psa) { $("evoGrid").innerHTML = `<tr><td class="empty">No data yet.</td></tr>`; return; }
+  const valids = [...new Set(FC.filter(r => r.psa === psa).map(r => r.valid_date))].sort().reverse();
+  const cutoff = addDays(ISSUES[ISSUES.length - 1], -span);
+  let h = `<tr><th class="l">Target date</th>${[7, 6, 5, 4, 3, 2, 1].map(l => `<th>Day ${l}</th>`).join("")}<th class="l">Observed</th><th class="l">Fire</th></tr>`;
+  for (const v of valids.filter(v => v >= cutoff)) {
+    const ob = obsMap.get(psa + "|" + v), fire = fireSet.get(psa + "|" + v);
+    h += `<tr><td class="l">${fmtDay(v)}</td>` +
+      [7, 6, 5, 4, 3, 2, 1].map(l => cell(byPsaValidLead.get(`${psa}|${v}|${l}`), psa, v, "not issued yet or not archived")).join("") +
+      `<td class="l">${ob ? esc((ob.observed || "–") + (ob.possible ? " " + ob.possible : "")) : ""}</td>` +
+      `<td class="l" style="font-family:inherit">${fire ? esc(fire) : ""}</td></tr>`;
+  }
+  $("evoGrid").innerHTML = h;
+}
+
+// ------------------------------------------------------------------ weather check
+function wxClass(f, ob) {
+  // f = forecast trigger ("", W, B, L, WB); ob.observed = letters met (L only when confirmed by hand)
+  const o = ob.observed || "";
+  if (f === "L" && !o.includes("L")) return "ltgreview";
+  if (f) {
+    const want = f === "WB" ? ["W", "B"] : [f];
+    if (want.some(x => o.includes(x))) return "verified";
+    if (o) return "other";
+    if ((ob.possible || "").includes(f) || (f === "WB" && (ob.possible || "").includes("B"))) return "possible";
+    return "notmet";
+  }
+  return o ? "missed" : "quiet";
+}
+
+function renderWeather() {
+  const out = $("wxBody");
+  if (!OBS.length) {
+    out.innerHTML = `<div class="empty">No observed weather checked yet. The first check runs the evening after setup and covers the previous days.</div>`; return;
+  }
+  const lead = $("wxLead").value, from = $("wxFrom").value || "0000", to = $("wxTo").value || "9999", ps = $("wxPsa").value;
+  const pairs = [];
+  for (const ob of OBS) {
+    if (ob.date < from || ob.date > to || (ps && ob.psa !== ps)) continue;
+    const r = byPsaValidLead.get(`${ob.psa}|${ob.date}|${lead}`);
+    if (!r || r.dryness_code === "0") continue;
+    pairs.push({ r, ob, f: trigOf(r), cls: wxClass(trigOf(r), ob) });
+  }
+  if (!pairs.length) { out.innerHTML = `<div class="empty">No days with both an archived Day ${lead} forecast and an observed-weather check in this range yet.</div>`; return; }
+
+  const cnt = c => pairs.filter(p => p.cls === c).length;
+  const hr = pairs.filter(p => p.f).length, obsDays = pairs.filter(p => p.ob.observed).length;
+  const pct = (a, b) => b ? Math.round(a / b * 100) + "%" : "–";
+  let h = `<div class="stats">
+    <div class="stat"><small>High Risk forecasts</small><b>${hr}</b><small>PSA-days on Day ${lead}</small></div>
+    <div class="stat"><small>Criteria met</small><b class="good">${pct(cnt("verified"), hr)}</b><small>${cnt("verified")} of ${hr} matched the forecast trigger</small></div>
+    <div class="stat"><small>Different trigger</small><b class="info">${cnt("other")}</b><small>High Risk, but another trigger was observed</small></div>
+    <div class="stat"><small>Criteria not met</small><b class="warn">${cnt("notmet")}</b><small>High Risk with no trigger observed${cnt("possible") ? ` (+${cnt("possible")} unconfirmed)` : ""}</small></div>
+    <div class="stat"><small>Should have been considered</small><b class="warn">${cnt("missed")}</b><small>criteria met, no High Risk forecast (${pct(cnt("missed"), obsDays)} of observed)</small></div>
+    <div class="stat"><small>Lightning to review</small><b class="info">${cnt("ltgreview")}</b><small>L forecasts not yet confirmed in lightning.csv</small></div>
+  </div>`;
+
+  // breakdown table: forecast type vs observed
+  const rowsT = ["W", "B", "L", "WB", ""];
+  const colsO = [["W", "Wind met"], ["B", "Burn met"], ["L", "Lightning confirmed"], ["none", "Nothing met"]];
+  h += `<h3>Forecast vs. observed (Day ${lead})</h3><div class="scroll"><table class="num"><tr><th>Forecast</th><th>PSA-days</th>${colsO.map(c => `<th>${c[1]}</th>`).join("")}</tr>`;
+  for (const t of rowsT) {
+    const sub = pairs.filter(p => p.f === t);
+    if (!sub.length && t === "WB") continue;
+    const label = t ? `<i class="sw ${CAT[t].cls}" style="margin-right:8px">${t === "WB" ? "!" : t}</i>${CAT[t].label}` : "Not High Risk";
+    h += `<tr><td>${label}</td><td>${sub.length}</td>` + colsO.map(([k]) => {
+      const n = k === "none" ? sub.filter(p => !p.ob.observed).length : sub.filter(p => (p.ob.observed || "").includes(k)).length;
+      const hl = (t && (k === t || (t === "WB" && "WB".includes(k)) ) && n) ? "good" : ((!t && k !== "none" && n) || (t && k === "none" && n)) ? "warn" : "";
+      return `<td class="${hl}">${n}</td>`;
+    }).join("") + `</tr>`;
+  }
+  h += `</table></div><p class="note">Green = forecast trigger matched. Orange = criteria met without a High Risk forecast, or High Risk with nothing met.</p>`;
+
+  const detail = (list, title, sub) => {
+    if (!list.length) return `<h3>${title}</h3><p class="note">None in this range.</p>`;
+    list.sort((a, b) => b.ob.date.localeCompare(a.ob.date) || a.ob.psa.localeCompare(b.ob.psa));
+    let t = `<h3>${title} <span class="note">(${list.length})</span></h3><p class="note">${sub}</p><div class="scroll"><table class="list">
+      <tr><th>Date</th><th>Criteria</th><th>PSA</th><th>Forecast</th><th>Observed</th><th>Stations that hit</th><th>Min RH</th><th>Max wind / gust</th><th>Max temp</th><th>Haines</th></tr>`;
+    for (const p of list.slice(0, 200)) {
+      const o = p.ob, c = CAT[keyOf(p.r)];
+      const who = [o.wind_stations && `W: ${o.wind_stations}`, o.burn_stations && `B: ${o.burn_stations}`,
+        p.cls === "ltgreview" && o.dry_for_lightning !== "" && `${o.dry_for_lightning} of ${o.raws_reporting} stations dry enough for lightning`,
+        o.ltg_note && `L (manual): ${o.ltg_note}`].filter(Boolean).join("<br>");
+      t += `<tr><td class="m">${o.date}</td><td>${esc(o.criteria_set || o.season || "")}</td><td class="m">${o.psa}</td>
+        <td><span class="tag ${c.cls}">${c.letter === "!" ? "W/B" : (c.letter || c.label)}</span></td>
+        <td class="m">${esc(o.observed || "–")}${o.possible ? " " + esc(o.possible) : ""}</td>
+        <td>${who || `<span class="note">none (${o.raws_reporting} RAWS reporting, ${o.stations_needed} needed)</span>`}</td>
+        <td class="m">${o.min_rh !== "" ? Math.round(o.min_rh) + "%" : "–"}</td>
+        <td class="m">${o.max_wind_mph !== "" ? Math.round(o.max_wind_mph) : "–"} / ${o.max_gust_mph !== "" ? Math.round(o.max_gust_mph) : "–"} mph</td>
+        <td class="m">${o.max_temp_f !== "" ? Math.round(o.max_temp_f) + "°F" : "–"}</td>
+        <td class="m">${o.haines !== "" ? o.haines + " " + esc(o.sounding) : "–"}</td></tr>`;
+    }
+    return t + `</table></div>`;
+  };
+  h += detail(pairs.filter(p => p.cls === "missed"), "Should have been considered for High Risk",
+    "Enough stations met a trigger, but the forecast was not High Risk.");
+  h += detail(pairs.filter(p => p.cls === "notmet" || p.cls === "possible"), "High Risk forecast, criteria not met",
+    "Forecast High Risk, but too few stations hit the criteria. B? means the station part was met but no sounding was available.");
+  h += detail(pairs.filter(p => p.cls === "ltgreview"), "Lightning forecasts to review",
+    "Lightning isn't confirmed automatically. If it verified, add the PSA and date to data/lightning.csv.");
+  h += detail(pairs.filter(p => p.cls === "other"), "High Risk, different trigger observed",
+    "A High Risk day, but the trigger that verified differs from the one forecast.");
+  out.innerHTML = h;
+}
+
+// ------------------------------------------------------------------ scorecard
+function renderScore() {
+  const out = $("scoreBody");
+  const def = $("evtDef").value, obsDef = $("obsDef").value;
+  const minA = +$("minAcres").value || 0;
+  const from = $("scoreFrom").value || "0000", to = $("scoreTo").value || "9999";
+  const today = todayMT();
+
+  const fireObs = new Set(FIRES.filter(f => (+f.acres || 0) >= minA).map(f => f.psa.toUpperCase() + "|" + f.date));
+  const wxObs = new Set(OBS.filter(o => o.observed).map(o => o.psa + "|" + o.date));
+  const wxChecked = new Set(OBS.map(o => o.psa + "|" + o.date));
+  const isEvent = k => obsDef === "fire" ? fireObs.has(k) : obsDef === "wx" ? wxObs.has(k) : (fireObs.has(k) || wxObs.has(k));
+  const yes = r => trigOf(r) ? true : (def === "hrvd" && r.dryness_code === "3");
+
+  const scored = FC.filter(r => r.valid_date < today && r.valid_date >= from && r.valid_date <= to && r.dryness_code !== "0"
+    && (obsDef === "fire" || wxChecked.has(r.psa + "|" + r.valid_date)));
+  if (!scored.length) {
+    out.innerHTML = `<div class="empty">Nothing to score yet. ${obsDef === "fire" ? "Scores appear once archived forecast days are in the past." : "Weather scores appear once past forecast days have been checked against observations."}</div>`; return;
+  }
+  const evName = { fire: "fire days", wx: "days with High Risk weather", either: "fire or High Risk weather days" }[obsDef];
+
+  const L = {}; for (let l = 1; l <= 7; l++) L[l] = { a: 0, b: 0, c: 0, d: 0 };
+  const catCount = {}; CAT_ORDER.concat(["WB"]).forEach(k => catCount[k] = { n: 0, f: 0 });
+  const evKeys = new Set();
+  for (const r of scored) {
+    const k = r.psa + "|" + r.valid_date, o = isEvent(k), f = yes(r), s = L[+r.lead_day];
+    if (o) evKeys.add(k);
+    if (f && o) s.a++; else if (f) s.b++; else if (o) s.c++; else s.d++;
+    if (+r.lead_day === 1) { const c = catCount[keyOf(r)]; if (c) { c.n++; if (o) c.f++; } }
+  }
+  const pct = x => isFinite(x) ? (x * 100).toFixed(0) + "%" : "–";
+  const num = x => isFinite(x) ? x.toFixed(2) : "–";
+  const m = s => ({ pod: s.a / (s.a + s.c), far: s.b / (s.a + s.b), csi: s.a / (s.a + s.b + s.c), bias: (s.a + s.b) / (s.a + s.c) });
+  const d1 = m(L[1]);
+
+  let h = `<div class="stats">
+    <div class="stat"><small>Day 1 POD</small><b>${pct(d1.pod)}</b><small>${evName} caught</small></div>
+    <div class="stat"><small>Day 1 FAR</small><b>${pct(d1.far)}</b><small>yes forecasts with no event</small></div>
+    <div class="stat"><small>Day 1 CSI</small><b>${num(d1.csi)}</b><small>overall skill on event days</small></div>
+    <div class="stat"><small>Day 1 bias</small><b>${num(d1.bias)}</b><small>&gt;1 = over-forecasting</small></div>
+    <div class="stat"><small>Event days</small><b>${evKeys.size}</b><small>PSA-${evName}</small></div>
+  </div>`;
+  h += `<h3>Skill by lead time</h3><div class="scroll"><table class="num"><tr><th>Lead</th><th>Pairs</th><th>Hits</th><th>Misses</th><th>False alarms</th><th>POD</th><th>FAR</th><th>CSI</th><th>Bias</th><th></th></tr>`;
+  for (let l = 1; l <= 7; l++) {
+    const s = L[l], x = m(s), n = s.a + s.b + s.c + s.d;
+    h += `<tr><td>Day ${l}</td><td>${n}</td><td>${s.a}</td><td>${s.c}</td><td>${s.b}</td><td>${pct(x.pod)}</td><td>${pct(x.far)}</td><td>${num(x.csi)}</td><td>${num(x.bias)}</td>
+      <td><span class="bar" style="width:${isFinite(x.csi) ? Math.round(x.csi * 120) : 0}px"></span></td></tr>`;
+  }
+  h += `</table></div>`;
+  h += `<h3>How often ${evName} followed each Day 1 category</h3><div class="scroll"><table class="num"><tr><th>Day 1 forecast</th><th>PSA-days</th><th>With event</th><th>Rate</th><th></th></tr>`;
+  const keys = CAT_ORDER.filter(k => k !== "0").concat(catCount["WB"].n ? ["WB"] : []);
+  const maxRate = Math.max(...keys.map(k => catCount[k].n ? catCount[k].f / catCount[k].n : 0), 0.0001);
+  for (const k of keys) {
+    const c = catCount[k], r = c.n ? c.f / c.n : NaN;
+    h += `<tr><td><i class="sw ${CAT[k].cls}" style="margin-right:8px">${CAT[k].letter === "!" ? "!" : CAT[k].letter}</i>${CAT[k].label}</td><td>${c.n}</td><td>${c.f}</td><td>${pct(r)}</td>
+      <td><span class="bar" style="width:${isFinite(r) ? Math.round(r / maxRate * 120) : 0}px"></span></td></tr>`;
+  }
+  h += `</table></div>`;
+  if (obsDef !== "fire") h += `<p class="note">Lightning counts as observed only on days confirmed in <code>data/lightning.csv</code>.</p>`;
+  if (obsDef !== "wx" && !FIRES.length) h += `<p class="note">No fires in <code>data/fires.csv</code> yet. See &ldquo;How it works&rdquo; to add them.</p>`;
+  out.innerHTML = h;
+}
+
+// ------------------------------------------------------------------ theme
+const SUN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`;
+const MOON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`;
+function isDark() {
+  const t = document.documentElement.getAttribute("data-theme");
+  return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function paintThemeBtn() { $("themeBtn").innerHTML = isDark() ? `${SUN}Light mode` : `${MOON}Dark mode`; }
+$("themeBtn").onclick = () => {
+  const next = isDark() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("theme", next); } catch {}
+  paintThemeBtn();
+};
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", paintThemeBtn);
+paintThemeBtn();
+
+// ------------------------------------------------------------------ criteria editor
+// Edits a working copy of config/criteria.json. "Save on GitHub" opens a pre-filled
+// issue; the apply-criteria workflow validates it, saves it and re-checks past days.
+const FIELDS = [
+  ["wind", "Wind (W)", [["sustained_mph", "Sustained wind at least", "mph"], ["gust_mph", "or gusts at least", "mph"],
+                        ["gust_hours", "for at least", "hours"], ["rh_max", "with RH at or below", "%"]]],
+  ["burn_environment", "Burn Environment (B)", [["degrees_above_typical", "Max temp above typical by", "°F"],
+                        ["rh_max", "with RH at or below", "%"], ["haines_min", "Haines at least", ""]]],
+  ["stations_needed", "Stations that must hit", [["default", "Most PSAs", "stations"],
+                        ["small_psa_station_count", "Small PSA = this many stations or fewer", ""], ["small_psa_needed", "Small PSAs need", "stations"]]],
+];
+let EDIT = null, ORIG = "";
+const clone = o => JSON.parse(JSON.stringify(o));
+const editable = c => ({
+  criteria_sets: Object.fromEntries(Object.entries(c.criteria_sets || {}).filter(([k]) => !k.startsWith("_"))),
+  schedule: clone(c.schedule || []).sort((a, b) => a.from.localeCompare(b.from)),
+  typical_peak_max_f: Object.fromEntries(Object.entries(c.typical_peak_max_f || {}).filter(([k]) => !k.startsWith("_"))),
+});
+const activeSet = (sched, d) => { let n = sched[0]?.set; for (const e of sched) if (e.from <= d) n = e.set; return n; };
+const dirty = () => JSON.stringify(EDIT) !== ORIG;
+
+function repoGuess() {
+  try { const s = localStorage.getItem("repo"); if (s) return s; } catch {}
+  const h = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0];
+  if (h.endsWith(".github.io")) return seg ? `${h.split(".")[0]}/${seg}` : `${h.split(".")[0]}/${h}`;
+  return "";
+}
+
+function initEditor() {
+  if (!CFG || !CFG.criteria_sets) {
+    $("crNow").innerHTML = `<p class="err">Couldn't read config/criteria.json, so criteria can't be edited here right now.</p>`; return;
+  }
+  EDIT = editable(CFG); ORIG = JSON.stringify(EDIT);
+  $("crAddSet").onclick = () => {
+    const base = activeSet(EDIT.schedule, todayMT()) || Object.keys(EDIT.criteria_sets)[0];
+    let n = "New set", i = 2; while (EDIT.criteria_sets[n]) n = `New set ${i++}`;
+    EDIT.criteria_sets[n] = { ...clone(EDIT.criteria_sets[base]), description: `Copy of ${base}` };
+    renderEditor();
+  };
+  renderEditor();
+}
+
+function renderEditor() {
+  const today = todayMT(), names = Object.keys(EDIT.criteria_sets);
+  const act = activeSet(EDIT.schedule, today);
+  const since = [...EDIT.schedule].reverse().find(e => e.from <= today && e.set === act)?.from;
+  const opts = sel => names.map(n => `<option ${n === sel ? "selected" : ""}>${esc(n)}</option>`).join("");
+
+  // --- in use now + switch + history
+  $("crNow").innerHTML = `
+    <h2>Criteria in use</h2>
+    <p style="margin:6px 0 2px"><span class="badge">In use today</span> <b style="font-size:17px;margin-left:6px">${esc(act || "none")}</b>
+      ${since ? `<span class="note">since ${fmtDay(since)}</span>` : ""}</p>
+    <p class="note" style="margin-top:2px">${esc(EDIT.criteria_sets[act]?.description || "")}</p>
+    <h3>Switch to a different set</h3>
+    <div class="row">
+      <select id="swSet">${opts(names.find(n => n !== act) || act)}</select>
+      <label for="swFrom">starting</label><input id="swFrom" type="date" value="${today}">
+      <input id="swNote" placeholder="Reason (optional)" style="flex:1;min-width:160px">
+      <button type="button" class="btn" id="swAdd">Add switch</button>
+    </div>
+    <p class="note">A start date in the past re-checks those days with the new set after you save.</p>
+    <h3>History</h3>
+    <div class="scroll"><table class="list"><tr><th>From</th><th>Set in use</th><th>Reason</th><th></th></tr>
+      ${[...EDIT.schedule].reverse().map((e, i, arr) => {
+        const idx = EDIT.schedule.indexOf(e), next = arr[i - 1];
+        return `<tr><td class="m">${e.from}</td><td><b>${esc(e.set)}</b>${e.from <= today && (!next || next.from > today) ? ` <span class="badge">now</span>` : e.from > today ? ` <span class="note">(scheduled)</span>` : ""}</td>
+        <td>${esc(e.note || "")}</td><td><button type="button" class="btn small" data-delsched="${idx}" ${EDIT.schedule.length < 2 ? "disabled title='At least one entry is needed'" : ""}>Remove</button></td></tr>`;
+      }).join("")}
+    </table></div>`;
+  $("swAdd").onclick = () => {
+    const from = $("swFrom").value, set = $("swSet").value;
+    if (!from) return;
+    EDIT.schedule = EDIT.schedule.filter(e => e.from !== from);
+    EDIT.schedule.push({ from, set, note: $("swNote").value.trim() });
+    EDIT.schedule.sort((a, b) => a.from.localeCompare(b.from));
+    renderEditor();
+  };
+  document.querySelectorAll("[data-delsched]").forEach(b => b.onclick = () => { EDIT.schedule.splice(+b.dataset.delsched, 1); renderEditor(); });
+
+  // --- sets
+  const orig = JSON.parse(ORIG).criteria_sets;
+  const used = new Set(EDIT.schedule.map(e => e.set));
+  $("crSets").className = "sets";
+  $("crSets").innerHTML = names.map(n => {
+    const s = EDIT.criteria_sets[n], o = orig[n];
+    return `<div class="set ${n === act ? "active" : ""}" data-set="${esc(n)}">
+      <div class="hd"><input value="${esc(n)}" data-rename aria-label="Set name">${n === act ? `<span class="badge">In use</span>` : ""}</div>
+      <input class="desc" value="${esc(s.description || "")}" placeholder="Description" data-desc>
+      ${FIELDS.map(([sec, title, fs]) => `<h4>${title}</h4>` + fs.map(([f, label, unit]) => {
+        const ch = o && o[sec] && +o[sec][f] !== +s[sec][f];
+        return `<div class="fld"><span>${label}</span><span><input type="number" step="any" value="${s[sec][f]}" data-sec="${sec}" data-f="${f}" class="${ch ? "changed" : ""}"> <span class="note" style="display:inline-block;width:44px">${unit}</span></span></div>`;
+      }).join("")).join("")}
+      <div class="row" style="margin:10px 0 0">
+        <button type="button" class="btn small" data-dup>Duplicate</button>
+        <button type="button" class="btn small" data-del ${used.has(n) || names.length < 2 ? `disabled title="${used.has(n) ? "Used in the history; remove it there first" : "At least one set is needed"}"` : ""}>Delete</button>
+      </div></div>`;
+  }).join("");
+  document.querySelectorAll("#crSets .set").forEach(card => {
+    const n = card.dataset.set, s = () => EDIT.criteria_sets[n];
+    card.querySelectorAll("input[data-sec]").forEach(inp => inp.oninput = () => {
+      s()[inp.dataset.sec][inp.dataset.f] = inp.value === "" ? "" : +inp.value;
+      const o = orig[n]; inp.classList.toggle("changed", !!o && +o[inp.dataset.sec][inp.dataset.f] !== +inp.value);
+      renderSaveBar();
+    });
+    card.querySelector("[data-desc]").oninput = e => { s().description = e.target.value; renderSaveBar(); };
+    card.querySelector("[data-rename]").onchange = e => {
+      const nn = e.target.value.trim().slice(0, 40);
+      if (!nn || nn === n) { e.target.value = n; return; }
+      if (EDIT.criteria_sets[nn]) { alert(`A set named "${nn}" already exists.`); e.target.value = n; return; }
+      EDIT.criteria_sets = Object.fromEntries(Object.entries(EDIT.criteria_sets).map(([k, v]) => [k === n ? nn : k, v]));
+      EDIT.schedule.forEach(x => { if (x.set === n) x.set = nn; });
+      renderEditor();
+    };
+    card.querySelector("[data-dup]").onclick = () => {
+      let c = `${n} copy`, i = 2; while (EDIT.criteria_sets[c]) c = `${n} copy ${i++}`;
+      EDIT.criteria_sets[c] = { ...clone(s()), description: `Copy of ${n}` }; renderEditor();
+    };
+    card.querySelector("[data-del]").onclick = () => { if (confirm(`Delete the set "${n}"?`)) { delete EDIT.criteria_sets[n]; renderEditor(); } };
+  });
+
+  // --- typical peak max by PSA
+  const psaList = [...new Set([...PSAS, ...Object.keys(EDIT.typical_peak_max_f)])].sort();
+  $("crTpm").innerHTML = psaList.length ? psaList.map(p => `<label>${p}<span><input type="number" step="1" placeholder="auto" value="${EDIT.typical_peak_max_f[p] ?? ""}" data-tpm="${p}"> °F</span></label>`).join("")
+    : `<p class="note">PSAs appear here after the first forecast is archived.</p>`;
+  document.querySelectorAll("[data-tpm]").forEach(inp => inp.oninput = () => {
+    if (inp.value === "") delete EDIT.typical_peak_max_f[inp.dataset.tpm]; else EDIT.typical_peak_max_f[inp.dataset.tpm] = +inp.value;
+    renderSaveBar();
+  });
+  renderSaveBar();
+}
+
+function validateEdit() {
+  const lim = { sustained_mph: [1, 80], gust_mph: [1, 120], gust_hours: [1, 24], rh_max: [1, 60], degrees_above_typical: [0, 40],
+                haines_min: [2, 6], default: [1, 20], small_psa_station_count: [0, 20], small_psa_needed: [1, 20] };
+  for (const [n, s] of Object.entries(EDIT.criteria_sets))
+    for (const [sec, title, fs] of FIELDS) for (const [f, label] of fs) {
+      const v = s[sec][f], [lo, hi] = lim[f];
+      if (v === "" || !isFinite(v) || v < lo || v > hi) return `${n}: "${label}" (${title}) must be between ${lo} and ${hi}.`;
+    }
+  for (const [p, v] of Object.entries(EDIT.typical_peak_max_f)) if (!isFinite(v) || v < 40 || v > 130) return `Typical max for ${p} must be 40–130 °F.`;
+  if (!EDIT.schedule.length) return "The history needs at least one entry.";
+  return "";
+}
+
+function renderSaveBar() {
+  const bar = $("crSave"), d = dirty(), err = d ? validateEdit() : "";
+  bar.classList.toggle("clean", !d);
+  if (!d) { bar.innerHTML = `<span class="note">No unsaved changes. These are the criteria currently in use.</span>`; return; }
+  const repo = repoGuess();
+  bar.innerHTML = `<div><b>Unsaved changes.</b> <span class="note">Saving opens GitHub with your changes filled in; click <b>Submit new issue</b> there to apply them.</span>
+      ${err ? `<div class="err">${esc(err)}</div>` : ""}
+      ${repo ? "" : `<div class="row" style="margin:8px 0 0"><label for="repoIn">GitHub repository (owner/name)</label><input id="repoIn" placeholder="yourname/sw-7day-verification"></div>`}</div>
+    <div class="row" style="margin:0"><button type="button" class="btn" id="crUndo">Discard changes</button>
+      <button type="button" class="btn primary" id="crGo" ${err ? "disabled" : ""}>Save on GitHub</button></div>`;
+  $("crUndo").onclick = () => { EDIT = JSON.parse(ORIG); renderEditor(); };
+  $("crGo").onclick = () => {
+    let r = repo || ($("repoIn")?.value || "").trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(r)) { alert("Enter the GitHub repository as owner/name."); return; }
+    try { if (!repo) localStorage.setItem("repo", r); } catch {}
+    const today = todayMT(), act = activeSet(EDIT.schedule, today);
+    const body = `Criteria changes from the website. **Click "Submit new issue" to apply them.** ` +
+      `They'll be checked, saved, and past days re-checked automatically; you'll get a reply here when it's done.\n\n` +
+      `In use today: **${act}**\n\n\`\`\`json\n${JSON.stringify(EDIT)}\n\`\`\`\n`;
+    const url = `https://github.com/${r}/issues/new?title=${encodeURIComponent("[criteria] Update criteria (" + today + ")")}&body=${encodeURIComponent(body)}`;
+    if (url.length > 7800) {
+      navigator.clipboard?.writeText(body);
+      alert("The change is too long for a link, so it was copied to your clipboard. Paste it into the issue body on the GitHub page that opens.");
+      window.open(`https://github.com/${r}/issues/new?title=${encodeURIComponent("[criteria] Update criteria (" + today + ")")}`, "_blank");
+    } else window.open(url, "_blank");
+    bar.innerHTML = `<span><b>Opened GitHub.</b> <span class="note">Click <b>Submit new issue</b> there. The site picks up the change in about 1–3 minutes; reload then.</span></span>
+      <button type="button" class="btn" id="crBack">Back to editing</button>`;
+    $("crBack").onclick = renderSaveBar;
+  };
+}
+addEventListener("beforeunload", e => { if (EDIT && dirty()) { e.preventDefault(); e.returnValue = ""; } });
+
+// ------------------------------------------------------------------ boot
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button, section").forEach(e => e.classList.remove("on"));
+  b.classList.add("on"); $(b.dataset.tab).classList.add("on");
+  try { localStorage.setItem("tab", b.dataset.tab); } catch {}
+});
+
+(async () => {
+  [FC, FIRES, OBS, LTG, CFG] = await Promise.all([getCSV("data/forecasts.csv"), getCSV("data/fires.csv"),
+    getCSV("data/observed.csv"), getCSV("data/lightning.csv"),
+    fetch("config/criteria.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)]);
+  FIRES = FIRES.filter(f => f.date && f.psa);
+
+  // merge hand-confirmed lightning into the observed rows
+  const obsIdx = new Map(OBS.map(o => [o.psa + "|" + o.date, o]));
+  for (const l of LTG.filter(l => l.date && l.psa)) {
+    const k = l.psa.toUpperCase() + "|" + l.date;
+    let o = obsIdx.get(k);
+    if (!o) {   // a lightning day with no automatic weather check (e.g. before the archive started)
+      o = { date: l.date, psa: l.psa.toUpperCase(), season: "", observed: "", possible: "", raws_reporting: "", stations_needed: "",
+            wind_stations: "", burn_stations: "", dry_for_lightning: "", min_rh: "", max_wind_mph: "", max_gust_mph: "", max_temp_f: "", haines: "", sounding: "" };
+      OBS.push(o); obsIdx.set(k, o);
+    }
+    if (!(o.observed || "").includes("L")) o.observed = (o.observed || "") + "L";
+    o.ltg_note = l.notes || "confirmed";
+  }
+  for (const f of FIRES) {
+    const k = f.psa.toUpperCase() + "|" + f.date, label = `${f.fire_name || "Fire"}${f.acres ? " (" + f.acres + " ac)" : ""}`;
+    fireSet.set(k, fireSet.has(k) ? fireSet.get(k) + "; " + label : label);
+  }
+  for (const o of OBS) obsMap.set(o.psa + "|" + o.date, o);
+  for (const r of FC) {
+    if (!byIssue.has(r.issue_date)) byIssue.set(r.issue_date, []);
+    byIssue.get(r.issue_date).push(r);
+    byPsaValidLead.set(`${r.psa}|${r.valid_date}|${r.lead_day}`, r);
+  }
+  ISSUES = [...byIssue.keys()].sort();
+  PSAS = [...new Set(FC.map(r => r.psa))].sort();
+
+  const obsDates = [...new Set(OBS.map(o => o.date))].sort();
+  $("status").textContent = !ISSUES.length
+    ? "No forecasts archived yet. The first one will appear after the evening GitHub Action runs."
+    : `${ISSUES.length} forecast${ISSUES.length > 1 ? "s" : ""} archived (${ISSUES[0]} to ${ISSUES[ISSUES.length - 1]}) · ${PSAS.length} PSAs · ` +
+      `${obsDates.length} days of observed weather checked · ${LTG.length} lightning days confirmed · ${FIRES.length} fires recorded`;
+  initEditor();
+
+  $("issueSel").innerHTML = [...ISSUES].reverse().map(d => `<option value="${d}">${fmtDay(d)} (${d})</option>`).join("");
+  $("psaSel").innerHTML = PSAS.map(p => `<option>${p}</option>`).join("");
+  $("wxPsa").innerHTML += PSAS.map(p => `<option>${p}</option>`).join("");
+  if (ISSUES.length) { $("scoreFrom").value = ISSUES[0]; $("wxFrom").value = ISSUES[0]; }
+
+  document.querySelectorAll(".legendBox").forEach(el => el.innerHTML = legendHTML());
+  $("issueSel").onchange = renderIssue; $("psaSel").onchange = renderEvolution; $("evoRange").onchange = renderEvolution;
+  ["wxLead", "wxFrom", "wxTo", "wxPsa"].forEach(id => $(id).oninput = renderWeather);
+  ["evtDef", "obsDef", "minAcres", "scoreFrom", "scoreTo"].forEach(id => $(id).oninput = renderScore);
+  renderIssue(); renderEvolution(); renderWeather(); renderScore();
+
+  try { const t = localStorage.getItem("tab"); if (t) document.querySelector(`nav button[data-tab="${t}"]`)?.click(); } catch {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "_readme": "Edit these from the Criteria tab on the website. Each criteria set is a full list of thresholds. The schedule says which set is in use from which date; each day is checked with the set in use on that day.",
+
+  "criteria_sets": {
+    "Standard": {
+      "description": "Full wind criteria (windy seasons).",
+      "wind": { "sustained_mph": 20, "gust_mph": 35, "gust_hours": 2, "rh_max": 15 },
+      "burn_environment": { "degrees_above_typical": 5, "rh_max": 15, "haines_min": 5 },
+      "stations_needed": { "default": 2, "small_psa_station_count": 3, "small_psa_needed": 1 }
+    },
+    "Hot season": {
+      "description": "Example: less wind needed when temperatures are high. Adjust before using.",
+      "wind": { "sustained_mph": 15, "gust_mph": 25, "gust_hours": 2, "rh_max": 15 },
+      "burn_environment": { "degrees_above_typical": 5, "rh_max": 15, "haines_min": 5 },
+      "stations_needed": { "default": 2, "small_psa_station_count": 3, "small_psa_needed": 1 }
+    }
+  },
+
+  "schedule": [
+    { "from": "2026-01-01", "set": "Standard", "note": "Starting criteria" }
+  ],
+
+  "typical_peak_max_f": {
+    "_note": "Optional. Typical peak fire season max temperature (F) for a PSA, used by Burn Environment. PSAs not listed are estimated from each station's elevation."
+  },
+
+  "lightning": {
+    "_note": "Lightning is confirmed by hand in data/lightning.csv. This value only sets which stations are shown as 'dry enough' for context.",
+    "rh_below": 20
+  },
+
+  "afternoon_hours": {
+    "_note": "Local (Mountain) hours used for max temp / min RH. Wind is checked over the whole day.",
+    "start": 10,
+    "end": 20
+  }
+}
