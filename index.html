@@ -14,16 +14,21 @@
     /* product colors, matching the official 7-day map */
     --green: #5fb336; --yellow: #ffff40; --brown: #d9b46f;
     --orange: #ff8c00; --red: #e81e1e; --gray: #b4b4b4;
+    /* outcome + series colors (validated for color-blind separation) */
+    --o-hit: #2b6cb0; --o-fa: #e8a33d; --o-miss: #b8336a; --o-quiet: #cfcbc2;
+    --s1: #2b6cb0; --s2: #e8a33d;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #161816; --panel: #1f221f; --ink: #e8e6e0; --muted: #9aa09a; --line: #343834;
       --accent: #e0703f; --good: #6cc27a; --warn: #e0703f; --info: #7fa6dd;
+    --o-hit: #3b82c4; --o-fa: #b07d22; --o-miss: #c2417a; --o-quiet: #4a4f4a; --s1: #3b82c4; --s2: #b07d22;
     }
   }
   :root[data-theme="dark"] {
     --bg: #161816; --panel: #1f221f; --ink: #e8e6e0; --muted: #9aa09a; --line: #343834;
     --accent: #e0703f; --good: #6cc27a; --warn: #e0703f; --info: #7fa6dd;
+    --o-hit: #3b82c4; --o-fa: #b07d22; --o-miss: #c2417a; --o-quiet: #4a4f4a; --s1: #3b82c4; --s2: #b07d22;
   }
   header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
   #themeBtn { flex: none; display: inline-flex; align-items: center; gap: 6px; font: 500 13px "IBM Plex Sans", sans-serif;
@@ -116,6 +121,60 @@
              box-shadow: 0 4px 18px rgba(0,0,0,.12); }
   .savebar.clean { position: static; box-shadow: none; }
   .err { color: var(--warn); font-size: 13px; }
+  .mapwrap { position: relative; max-width: 820px; }
+  .mapwrap svg { display: block; width: 100%; height: auto; }
+  .mapwrap g.psa path { stroke: var(--panel); stroke-width: 1.5; cursor: pointer; }
+  .mapwrap g.psa path.nodata { fill: transparent; stroke: var(--muted); stroke-dasharray: 3 3; stroke-width: 1; }
+  .mapwrap g.psa:hover path, .mapwrap g.psa:focus path { stroke: var(--ink); stroke-width: 2.5; }
+  .mapwrap g.psa:focus { outline: none; }
+  .chartwrap .pt { cursor: default; }
+  .calwrap svg { max-width: none; }
+  .stack > .chartwrap { margin-bottom: 14px; }
+  .inclist { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+  .inclist label { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+                   font-size: 13.5px; color: var(--ink); cursor: pointer; background: var(--bg); }
+  .inclist input { margin-top: 3px; }
+  #printReport { display: none; }
+  @media print {
+    @page { size: letter landscape; margin: 10mm; }
+    body { background: #fff !important; color: #111 !important; font: 10px/1.35 Helvetica, Arial, sans-serif; }
+    body > *:not(#printReport) { display: none !important; }
+    #printReport { display: block; }
+    #printReport * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #printReport h1 { font-size: 16px; margin: 0 0 6px; }
+    #printReport h2 { font-size: 12.5px; margin: 0 0 3px; }
+    #printReport .pn { color: #555; margin: 0 0 5px; font-size: 9.5px; }
+    #printReport .psec { margin-top: 12px; break-inside: auto; }
+    #printReport .pbreak { break-before: page; margin-top: 0; }
+    #printReport .pkeep { break-inside: avoid; }
+    #printReport td, #printReport th { text-align: left; }
+    #printReport .pchart + table.pt, #printReport .pkeep table.pt { break-inside: avoid; }
+    #printReport .psec h2 { break-after: avoid; }
+    #printReport .pmeta th { text-align: left; padding: 1px 12px 1px 0; color: #555; font-weight: normal; }
+    #printReport .pmeta td { padding: 1px 0; font-weight: bold; }
+    #printReport table.pt { border-collapse: collapse; width: auto; max-width: 100%; }
+    #printReport table.pt th { background: #e8e6e0; text-align: left; padding: 3px 6px; border: 1px solid #ccc; font-size: 9px; }
+    #printReport table.pt td { padding: 2px 6px; border: 1px solid #ddd; font-size: 9.5px; vertical-align: top; }
+    #printReport table.pt thead { display: table-header-group; }
+    #printReport table.pt tr { break-inside: avoid; }
+    #printReport .pgrid table.pt td { text-align: center; font-size: 8.5px; padding: 2px 3px; min-width: 34px; }
+    #printReport .pgrid table.pt td:first-child { text-align: left; white-space: nowrap; }
+    #printReport .pm { font-size: 7.5px; font-weight: bold; }
+    #printReport .pk { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; border: 1px solid #888; }
+    #printReport .pchart { margin: 4px 0 8px; }
+  }
+  .psagrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+  .psagrid label { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px;
+                   font: 13px "IBM Plex Mono", monospace; color: var(--ink); cursor: pointer; background: var(--bg); }
+  .psagrid label.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .psagrid label { white-space: nowrap; }
+  .psagrid label .tag { margin-left: auto; padding: 0 5px; font-size: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font: 12.5px "IBM Plex Mono", monospace; border: 1px solid var(--line);
+          border-radius: 999px; padding: 2px 4px 2px 9px; margin: 2px 4px 2px 0; background: var(--bg); }
+  .chip.new { border-color: var(--good); color: var(--good); }
+  .chip.del { text-decoration: line-through; opacity: .55; }
+  .chip button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
+  .chip button:hover { color: var(--warn); }
   /* scorecard */
   .controls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; }
   .ctl { display: flex; flex-direction: column; gap: 4px; }
@@ -180,9 +239,12 @@
 <nav>
   <button data-tab="forecast" class="on">Forecast archive</button>
   <button data-tab="evolution">Forecast evolution</button>
+  <button data-tab="map">Map</button>
   <button data-tab="weather">Weather check</button>
   <button data-tab="score">Scorecard</button>
+  <button data-tab="analysis">Analysis</button>
   <button data-tab="criteria">Criteria</button>
+  <button data-tab="export">Export</button>
   <button data-tab="about">How it works</button>
 </nav>
 <main>
@@ -216,6 +278,25 @@
     <div class="scroll"><table id="evoGrid"></table></div>
     <div class="legend legendBox"></div>
   </div>
+</section>
+
+<section id="map">
+  <div class="card controls">
+    <div class="ctl"><label for="mpView">Show</label><select id="mpView">
+      <option value="forecast">Forecast as issued</option><option value="outcome">Outcome (hit, miss, false alarm)</option><option value="season">Season score by PSA</option></select></div>
+    <div class="ctl" data-mp="forecast outcome"><label for="mpDate">Date</label><input id="mpDate" type="date"></div>
+    <div class="ctl" data-mp="forecast outcome"><label>&nbsp;</label><span class="row" style="margin:0;gap:6px">
+      <button type="button" class="btn" id="mpPrev" aria-label="Previous day">&lsaquo;</button><button type="button" class="btn" id="mpPlay">Play</button><button type="button" class="btn" id="mpNext" aria-label="Next day">&rsaquo;</button></span></div>
+    <div class="ctl" data-mp="season"><label for="mpMetric">Score</label><select id="mpMetric">
+      <option value="csi">Skill (CSI)</option><option value="pod">Events caught (POD)</option><option value="far">False alarm ratio</option><option value="bias">Bias</option><option value="events">Number of events</option><option value="yes">Number of yes forecasts</option></select></div>
+    <div class="ctl" data-mp="season"><label for="mpFrom">From</label><input id="mpFrom" type="date"></div>
+    <div class="ctl" data-mp="season"><label for="mpTo">To</label><input id="mpTo" type="date"></div>
+      <div class="ctl" data-mp="outcome season"><label for="mpObs">Verify against</label><select id="mpObs"><option value="fire">Significant fires</option><option value="wx">Observed High Risk weather</option><option value="either">Fire or High Risk weather</option></select></div>
+      <div class="ctl"><label for="mpLead">Forecast</label><select id="mpLead"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option><option value="7">Day 7</option></select></div>
+      <div class="ctl" data-mp="outcome season"><label for="mpYes">A &ldquo;yes&rdquo; forecast is</label><select id="mpYes"><option value="hrvd" selected>High Risk or Moderate Risk</option><option value="hr">High Risk only (W, B or L)</option></select></div>
+      <div class="ctl" id="mpAcresCtl" data-mp="outcome season"><label for="mpAcres">Fires of at least</label><span><input id="mpAcres" type="number" min="0" value="0" style="width:90px"> <span class="note">acres</span></span></div>
+  </div>
+  <div class="card" id="mpBox"></div>
 </section>
 
 <section id="weather">
@@ -263,6 +344,18 @@
   <div id="scoreBody"></div>
 </section>
 
+<section id="analysis">
+  <div class="card controls">
+      <div class="ctl"><label for="anObs">Verify against</label><select id="anObs"><option value="fire">Significant fires</option><option value="wx">Observed High Risk weather</option><option value="either">Fire or High Risk weather</option></select></div>
+      <div class="ctl"><label for="anLead">Forecast</label><select id="anLead"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option><option value="7">Day 7</option></select></div>
+      <div class="ctl"><label for="anYes">A &ldquo;yes&rdquo; forecast is</label><select id="anYes"><option value="hrvd" selected>High Risk or Moderate Risk</option><option value="hr">High Risk only (W, B or L)</option></select></div>
+      <div class="ctl" id="anAcresCtl"><label for="anAcres">Fires of at least</label><span><input id="anAcres" type="number" min="0" value="0" style="width:90px"> <span class="note">acres</span></span></div>
+    <div class="ctl"><label for="anFrom">From</label><input id="anFrom" type="date"></div>
+    <div class="ctl"><label for="anTo">To</label><input id="anTo" type="date"></div>
+  </div>
+  <div id="anBody"></div>
+</section>
+
 <section id="criteria">
   <div class="card" id="crNow"></div>
   <div class="card">
@@ -276,13 +369,79 @@
     <p class="note">Used by Burn Environment (&ldquo;temperatures much above typical peak fire season max&rdquo;). Leave blank to estimate from each station's elevation.</p>
     <div id="crTpm" class="tpm"></div>
   </div>
+  <div class="card">
+    <h2>Lightning days observed</h2>
+    <p class="note">Lightning isn't confirmed automatically. Pick a day, tick the PSAs where the Lightning criteria were met, and add it. PSAs with an <span class="tag k-L" style="padding:0 5px">L</span> forecast that day are marked to help.</p>
+    <div class="row" style="margin-top:12px">
+      <div class="ctl"><label for="lgDate">Date</label><input id="lgDate" type="date"></div>
+      <div class="ctl" style="flex:1;min-width:200px"><label for="lgNote">Note (optional)</label><input id="lgNote" placeholder="e.g. scattered dry storms, RH 12-18%" maxlength="200"></div>
+    </div>
+    <div class="row" style="margin:4px 0 6px"><span class="note">PSAs that hit:</span>
+      <button type="button" class="btn small" id="lgAll">Select all</button><button type="button" class="btn small" id="lgNone">Clear</button>
+      <button type="button" class="btn small" id="lgL">Select L-forecast PSAs</button></div>
+    <div id="lgPsas" class="psagrid"></div>
+    <div class="row" style="margin-top:10px"><button type="button" class="btn primary" id="lgAdd">Add lightning day</button><span class="err" id="lgErr"></span></div>
+    <h3>Recorded lightning days</h3>
+    <div id="lgList"></div>
+  </div>
   <div class="card savebar" id="crSave"></div>
+</section>
+
+<section id="export">
+  <div class="card">
+    <h2>Export a report</h2>
+    <p class="note">Pick a date range, the PSAs and what to include, then download. Everything is built from the data on this site.</p>
+    <h3>Date range</h3>
+    <div class="row">
+      <div class="ctl"><label for="exFrom">From</label><input id="exFrom" type="date"></div>
+      <div class="ctl"><label for="exTo">To</label><input id="exTo" type="date"></div>
+      <div class="ctl"><label>Quick pick</label><span class="row" style="margin:0;gap:6px">
+        <button type="button" class="btn small" data-exrange="7">Last 7 days</button>
+        <button type="button" class="btn small" data-exrange="30">Last 30 days</button>
+        <button type="button" class="btn small" data-exrange="-1">This year</button>
+        <button type="button" class="btn small" data-exrange="0">Everything</button></span></div>
+    </div>
+    <h3>PSAs</h3>
+    <div class="row" style="margin-bottom:6px"><button type="button" class="btn small" id="exPsaAll">Select all</button><button type="button" class="btn small" id="exPsaNone">Clear</button></div>
+    <div id="exPsas" class="psagrid"></div>
+    <h3>Scoring</h3>
+    <div class="row">
+      <div class="ctl"><label for="exObs">Verify against</label>
+        <select id="exObs"><option value="fire">Significant fires</option><option value="wx">Observed High Risk weather</option><option value="either">Fire or High Risk weather</option></select></div>
+      <div class="ctl"><label for="exLead">Forecast</label>
+        <select id="exLead"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option><option value="7">Day 7</option></select></div>
+      <div class="ctl"><label for="exYes">A &ldquo;yes&rdquo; forecast is</label>
+        <select id="exYes"><option value="hrvd" selected>High Risk or Moderate Risk</option><option value="hr">High Risk only (W, B or L)</option></select></div>
+      <div class="ctl" id="exAcresCtl"><label for="exAcres">Fires of at least</label><span><input id="exAcres" type="number" min="0" value="0" style="width:90px"> <span class="note">acres</span></span></div>
+    </div>
+    <h3>Include</h3>
+    <div id="exInc" class="inclist">
+      <label><input type="checkbox" value="scores" checked><span><b>Scorecard</b><br><span class="note">hits and misses, chart and table by category, skill by lead time, by PSA</span></span></label>
+      <label><input type="checkbox" value="month" checked><span><b>Scores by month</b><br><span class="note">for seasonal and end-of-year reviews</span></span></label>
+      <label><input type="checkbox" value="review" checked><span><b>Misses and false alarms</b><br><span class="note">every day to review, with what was forecast and observed</span></span></label>
+      <label><input type="checkbox" value="grid" checked><span><b>Forecast by date and PSA</b><br><span class="note">color-coded grid for the chosen forecast day</span></span></label>
+      <label><input type="checkbox" value="evo"><span><b>Forecast evolution</b><br><span class="note">Day 7 through Day 1 for every date, with how often it changed</span></span></label>
+      <label><input type="checkbox" value="wx" checked><span><b>Observed weather check</b><br><span class="note">Wind and Burn Environment results with the stations that hit</span></span></label>
+      <label><input type="checkbox" value="ltg" checked><span><b>Lightning days</b></span></label>
+      <label><input type="checkbox" value="fires" checked><span><b>Fires</b></span></label>
+      <label><input type="checkbox" value="crit"><span><b>Criteria used</b><br><span class="note">criteria sets and when each was in use</span></span></label>
+      <label><input type="checkbox" value="all"><span><b>All archived forecasts</b> <span class="note">(Excel only)</span><br><span class="note">every Day 1&ndash;7 forecast in the range</span></span></label>
+    </div>
+  </div>
+  <div class="card savebar clean">
+    <div><span class="err" id="exErr"></span> <span class="note" id="exMsg"></span></div>
+    <div class="row" style="margin:0">
+      <button type="button" class="btn" id="exCsv" title="One row per PSA forecast with what happened; for use in other tools">Download data (CSV)</button>
+      <button type="button" class="btn" id="exPdf">Save as PDF</button>
+      <button type="button" class="btn primary" id="exXlsx">Download Excel</button>
+    </div>
+  </div>
 </section>
 
 <section id="about">
   <div class="card">
     <h2>What this page is</h2>
-    <p>Every evening a GitHub Action saves the Southwest PSAs from the national 7-Day Significant Fire Potential (all seven days) to <code>data/forecasts.csv</code>. It then checks the previous day's observed weather against the Wind and Burn Environment criteria in use that day and saves the result to <code>data/observed.csv</code>. Lightning is confirmed by hand.</p>
+    <p>Every night at about 3 am Mountain time a GitHub Action saves the previous day's 7-Day Significant Fire Potential for the Southwest PSAs (all seven days) to <code>data/forecasts.csv</code>. It then checks the previous day's observed weather against the Wind and Burn Environment criteria in use that day and saves the result to <code>data/observed.csv</code>. Lightning is confirmed by hand.</p>
 
     <h3>Forecast categories</h3>
     <div class="legend legendBox" style="margin-top:0"></div>
@@ -292,7 +451,7 @@
     <ul>
       <li><b>Wind (W):</b> an hour with sustained wind at or above the limit and RH at or below the limit, or several hours of gusts at or above the gust limit with low RH.</li>
       <li><b>Burn Environment (B):</b> afternoon max temperature well above the typical peak-season max with low RH, plus elevated instability (high-elevation Haines from the nearest 00Z sounding). Typical peak-season max is estimated from station elevation unless a PSA value is set. <b>B?</b> means the station part was met but no sounding was available.</li>
-      <li><b>Lightning (L):</b> confirmed by hand. Add a row to <code>data/lightning.csv</code> for each PSA-day you confirm. The Weather check tab lists Lightning forecasts waiting for review with the number of dry stations as context.</li>
+      <li><b>Lightning (L):</b> confirmed by hand on the Criteria tab (Lightning days observed). The Weather check tab lists Lightning forecasts waiting for review with the number of dry stations as context.</li>
     </ul>
     <h3>Changing the criteria</h3>
     <p>Use the <b>Criteria</b> tab. You can keep several named sets (for example &ldquo;Standard&rdquo; and &ldquo;Hot season&rdquo;) and switch which one is in use, starting on any date you choose. Each day is checked with the set that was in use that day, so earlier results keep their original criteria unless you edit that set.</p>
@@ -300,8 +459,13 @@
     <p class="note">The Little/Low/Moderate risk levels depend on fuels (ERC and other indices), so the weather check covers the High Risk triggers only.</p>
 
     <h3>Confirming lightning</h3>
-    <p>Edit <code>data/lightning.csv</code> on GitHub (open the file, pencil icon, commit). One row per PSA-day:</p>
-    <p><code>date,psa,notes</code><br><code>2026-07-14,SW05,scattered dry storms, RH 12-18%</code></p>
+    <p>On the <b>Criteria</b> tab, under <b>Lightning days observed</b>, pick the date, tick the PSAs that hit (PSAs with an L forecast that day are marked), add a note if you like, and click <b>Add lightning day</b>. Then click <b>Save on GitHub</b>. Click &times; on a recorded PSA to remove it.</p>
+
+    <h3>Map and Analysis</h3>
+    <p>The <b>Map</b> tab shows the PSAs colored by the forecast as issued, by outcome (hit, false alarm, miss, correct quiet), or by a season score such as skill or bias. Step through days or press Play; click a PSA to open its scorecard. The <b>Analysis</b> tab shows reliability by observed ERC, minimum RH or peak gust; a calendar of outcomes by PSA; how often forecasts changed between Day 7 and Day 1; and weekly skill and bias.</p>
+
+    <h3>Exporting</h3>
+    <p>The <b>Export</b> tab builds an Excel workbook, a PDF report, or a plain data file (CSV) for any date range and any set of PSAs. Choose what to include: scorecard, scores by month, misses and false alarms to review, the color-coded forecast grid, forecast evolution, observed weather, lightning days, fires and the criteria used. For a PDF, choose &ldquo;Save as PDF&rdquo; as the destination in the print window.</p>
 
     <h3>Adding fires</h3>
     <p>Fire occurrence comes from <code>data/fires.csv</code>. Add one row per significant fire with the discovery date (Mountain time) and its PSA:</p>
@@ -318,6 +482,7 @@
 </section>
 
 </main>
+<div id="printReport"></div>
 
 <script>
 // ------------------------------------------------------------------ categories
@@ -441,7 +606,7 @@ function wxClass(f, ob) {
 function renderWeather() {
   const out = $("wxBody");
   if (!OBS.length) {
-    out.innerHTML = `<div class="empty">No observed weather checked yet. The first check runs the evening after setup and covers the previous days.</div>`; return;
+    out.innerHTML = `<div class="empty">No observed weather checked yet. The first check runs the night after setup and covers the previous days.</div>`; return;
   }
   const lead = $("wxLead").value, from = $("wxFrom").value || "0000", to = $("wxTo").value || "9999", ps = $("wxPsa").value;
   const pairs = [];
@@ -507,7 +672,7 @@ function renderWeather() {
   h += detail(pairs.filter(p => p.cls === "notmet" || p.cls === "possible"), "High Risk forecast, criteria not met",
     "Forecast High Risk, but too few stations hit the criteria. B? means the station part was met but no sounding was available.");
   h += detail(pairs.filter(p => p.cls === "ltgreview"), "Lightning forecasts to review",
-    "Lightning isn't confirmed automatically. If it verified, add the PSA and date to data/lightning.csv.");
+    "Lightning isn't confirmed automatically. If it verified, record it on the Criteria tab under Lightning days observed.");
   h += detail(pairs.filter(p => p.cls === "other"), "High Risk, different trigger observed",
     "A High Risk day, but the trigger that verified differs from the one forecast.");
   out.innerHTML = h;
@@ -714,6 +879,8 @@ const FIELDS = [
                         ["small_psa_station_count", "Small PSA = this many stations or fewer", ""], ["small_psa_needed", "Small PSAs need", "stations"]]],
 ];
 let EDIT = null, ORIG = "";
+let LG_ADD = [], LG_DEL = [];   // pending lightning changes: {date, psa, notes}
+const lgKey = r => r.date + "|" + r.psa;
 const clone = o => JSON.parse(JSON.stringify(o));
 const editable = c => ({
   criteria_sets: Object.fromEntries(Object.entries(c.criteria_sets || {}).filter(([k]) => !k.startsWith("_"))),
@@ -721,7 +888,7 @@ const editable = c => ({
   typical_peak_max_f: Object.fromEntries(Object.entries(c.typical_peak_max_f || {}).filter(([k]) => !k.startsWith("_"))),
 });
 const activeSet = (sched, d) => { let n = sched[0]?.set; for (const e of sched) if (e.from <= d) n = e.set; return n; };
-const dirty = () => JSON.stringify(EDIT) !== ORIG;
+const dirty = () => JSON.stringify(EDIT) !== ORIG || LG_ADD.length > 0 || LG_DEL.length > 0;
 
 function repoGuess() {
   try { const s = localStorage.getItem("repo"); if (s) return s; } catch {}
@@ -735,6 +902,7 @@ function initEditor() {
     $("crNow").innerHTML = `<p class="err">Couldn't read config/criteria.json, so criteria can't be edited here right now.</p>`; return;
   }
   EDIT = editable(CFG); ORIG = JSON.stringify(EDIT);
+  initLightning();
   $("crAddSet").onclick = () => {
     const base = activeSet(EDIT.schedule, todayMT()) || Object.keys(EDIT.criteria_sets)[0];
     let n = "New set", i = 2; while (EDIT.criteria_sets[n]) n = `New set ${i++}`;
@@ -857,7 +1025,7 @@ function renderSaveBar() {
       ${repo ? "" : `<div class="row" style="margin:8px 0 0"><label for="repoIn">GitHub repository (owner/name)</label><input id="repoIn" placeholder="yourname/sw-7day-verification"></div>`}</div>
     <div class="row" style="margin:0"><button type="button" class="btn" id="crUndo">Discard changes</button>
       <button type="button" class="btn primary" id="crGo" ${err ? "disabled" : ""}>Save on GitHub</button></div>`;
-  $("crUndo").onclick = () => { EDIT = JSON.parse(ORIG); renderEditor(); };
+  $("crUndo").onclick = () => { EDIT = JSON.parse(ORIG); LG_ADD = []; LG_DEL = []; renderLightning(); renderEditor(); };
   $("crGo").onclick = () => {
     let r = repo || ($("repoIn")?.value || "").trim();
     if (!/^[\w.-]+\/[\w.-]+$/.test(r)) { alert("Enter the GitHub repository as owner/name."); return; }
@@ -865,7 +1033,9 @@ function renderSaveBar() {
     const today = todayMT(), act = activeSet(EDIT.schedule, today);
     const body = `Criteria changes from the website. **Click "Submit new issue" to apply them.** ` +
       `They'll be checked, saved, and past days re-checked automatically; you'll get a reply here when it's done.\n\n` +
-      `In use today: **${act}**\n\n\`\`\`json\n${JSON.stringify(EDIT)}\n\`\`\`\n`;
+      `In use today: **${act}**` +
+      (LG_ADD.length ? `\n\nLightning days to add: ${LG_ADD.length}` : "") + (LG_DEL.length ? `\n\nLightning days to remove: ${LG_DEL.length}` : "") +
+      `\n\n\`\`\`json\n${JSON.stringify({ ...EDIT, lightning_add: LG_ADD, lightning_remove: LG_DEL })}\n\`\`\`\n`;
     const url = `https://github.com/${r}/issues/new?title=${encodeURIComponent("[criteria] Update criteria (" + today + ")")}&body=${encodeURIComponent(body)}`;
     if (url.length > 7800) {
       navigator.clipboard?.writeText(body);
@@ -877,7 +1047,720 @@ function renderSaveBar() {
     $("crBack").onclick = renderSaveBar;
   };
 }
+// ---- lightning days
+function initLightning() {
+  const y = new Date(Date.now() - 864e5).toLocaleDateString("en-CA", { timeZone: "America/Denver" });
+  $("lgDate").value = y; $("lgDate").max = todayMT();
+  $("lgDate").oninput = renderLgPsas;
+  $("lgAll").onclick = () => { document.querySelectorAll("#lgPsas input").forEach(c => c.checked = true); renderLgPsas(true); };
+  $("lgNone").onclick = () => { document.querySelectorAll("#lgPsas input").forEach(c => c.checked = false); renderLgPsas(true); };
+  $("lgL").onclick = () => { document.querySelectorAll("#lgPsas input").forEach(c => c.checked = c.dataset.l === "1"); renderLgPsas(true); };
+  $("lgAdd").onclick = () => {
+    const d = $("lgDate").value, picked = [...document.querySelectorAll("#lgPsas input:checked")].map(c => c.value);
+    $("lgErr").textContent = !d ? "Pick a date." : d > todayMT() ? "That date is in the future." : !picked.length ? "Tick at least one PSA." : "";
+    if ($("lgErr").textContent) return;
+    const notes = $("lgNote").value.trim();
+    for (const psa of picked) {
+      const r = { date: d, psa, notes };
+      LG_DEL = LG_DEL.filter(x => lgKey(x) !== lgKey(r));
+      LG_ADD = LG_ADD.filter(x => lgKey(x) !== lgKey(r));
+      if (!LTG.some(x => lgKey({ date: x.date, psa: x.psa.toUpperCase() }) === lgKey(r) && (x.notes || "") === notes)) LG_ADD.push(r);
+    }
+    $("lgNote").value = "";
+    document.querySelectorAll("#lgPsas input").forEach(c => c.checked = false);
+    renderLightning(); renderSaveBar();
+  };
+  renderLightning();
+}
+function renderLgPsas(keep) {
+  const d = $("lgDate").value;
+  const checked = new Set(keep === true ? [...document.querySelectorAll("#lgPsas input:checked")].map(c => c.value) : []);
+  const lfc = new Set(FC.filter(r => r.valid_date === d && +r.lead_day === 1 && trigOf(r) === "L").map(r => r.psa));
+  const done = new Set(LTG.filter(x => x.date === d).map(x => x.psa.toUpperCase()).concat(LG_ADD.filter(x => x.date === d).map(x => x.psa)));
+  LG_DEL.filter(x => x.date === d).forEach(x => done.delete(x.psa));
+  $("lgPsas").innerHTML = PSAS.length ? PSAS.map(p => `<label class="${checked.has(p) ? "on" : ""}" title="${done.has(p) ? "Already recorded for this date" : ""}">
+      <input type="checkbox" value="${p}" data-l="${lfc.has(p) ? 1 : 0}" ${checked.has(p) ? "checked" : ""}>${p}${done.has(p) ? " &check;" : ""}
+      ${lfc.has(p) ? `<span class="tag k-L">L</span>` : ""}</label>`).join("")
+    : `<p class="note">PSAs appear here after the first forecast is archived.</p>`;
+  $("lgPsas").querySelectorAll("input").forEach(c => c.onchange = () => c.parentElement.classList.toggle("on", c.checked));
+}
+function renderLightning() {
+  renderLgPsas();
+  const rows = new Map();
+  for (const x of LTG.filter(x => x.date && x.psa)) rows.set(x.date + "|" + x.psa.toUpperCase(), { date: x.date, psa: x.psa.toUpperCase(), notes: x.notes || "", st: "" });
+  for (const x of LG_ADD) rows.set(lgKey(x), { ...x, st: "new" });
+  for (const x of LG_DEL) if (rows.has(lgKey(x))) rows.get(lgKey(x)).st = "del";
+  const byDate = {};
+  for (const r of rows.values()) (byDate[r.date] ||= []).push(r);
+  const dates = Object.keys(byDate).sort().reverse();
+  $("lgList").innerHTML = !dates.length ? `<p class="note">None recorded yet.</p>` :
+    `<div class="scroll"><table class="list"><tr><th>Date</th><th>PSAs that hit</th><th>Note</th></tr>` +
+    dates.map(d => {
+      const rs = byDate[d].sort((a, b) => a.psa.localeCompare(b.psa));
+      const notes = [...new Set(rs.map(r => r.notes).filter(Boolean))].join("; ");
+      return `<tr><td class="m">${d}</td><td>${rs.map(r => `<span class="chip ${r.st}">${r.psa}<button type="button" data-k="${d}|${r.psa}" title="${r.st === "del" ? "Undo remove" : "Remove"}">${r.st === "del" ? "&#8634;" : "&times;"}</button></span>`).join("")}</td><td>${esc(notes)}</td></tr>`;
+    }).join("") + `</table></div>` +
+    (LG_ADD.length || LG_DEL.length ? `<p class="note">Green = new, crossed out = will be removed. Click <b>Save on GitHub</b> to record the changes.</p>` : "");
+  $("lgList").querySelectorAll("button[data-k]").forEach(b => b.onclick = () => {
+    const [date, psa] = b.dataset.k.split("|"), k = date + "|" + psa;
+    if (LG_ADD.some(x => lgKey(x) === k)) LG_ADD = LG_ADD.filter(x => lgKey(x) !== k);
+    else if (LG_DEL.some(x => lgKey(x) === k)) LG_DEL = LG_DEL.filter(x => lgKey(x) !== k);
+    else LG_DEL.push({ date, psa, notes: "" });
+    renderLightning(); renderSaveBar();
+  });
+}
+
 addEventListener("beforeunload", e => { if (EDIT && dirty()) { e.preventDefault(); e.returnValue = ""; } });
+
+// ------------------------------------------------------------------ export (Excel + PDF)
+// Everything is built in the browser from the same CSV files the page already loaded.
+// Excel: a real .xlsx written here (no outside libraries). PDF: a formatted report sent to
+// the browser's print dialog, where "Save as PDF" is the destination.
+const XCAT = { "0": "No data", "1": "Little or No Risk", "2": "Low Risk", "3": "Moderate Risk",
+  W: "High Risk - Wind", B: "High Risk - Burn Env.", L: "High Risk - Lightning", WB: "High Risk - W/B" };
+const XSHORT = { "0": "No data", "1": "Little", "2": "Low", "3": "Moderate", W: "HR-W", B: "HR-B", L: "HR-L", WB: "HR-W/B" };
+const XHEX = { "0": "B4B4B4", "1": "5FB336", "2": "FFFF40", "3": "D9B46F", W: "FF8C00", B: "FF8C00", WB: "FF8C00", L: "E81E1E" };
+
+function exportOpts() {
+  return { from: $("exFrom").value || "0000-01-01", to: $("exTo").value || "9999-12-31", lead: +$("exLead").value,
+           obsDef: $("exObs").value, def: $("exYes").value, minA: +$("exAcres").value || 0,
+           inc: Object.fromEntries([...document.querySelectorAll("#exInc input")].map(c => [c.value, c.checked])),
+           psas: new Set([...document.querySelectorAll("#exPsas input:checked")].map(c => c.value)) };
+}
+
+function exportData(o) {
+  const today = todayMT();
+  const fireObs = new Set(FIRES.filter(f => (+f.acres || 0) >= o.minA).map(f => f.psa.toUpperCase() + "|" + f.date));
+  const wxObs = new Set(OBS.filter(x => x.observed).map(x => x.psa + "|" + x.date));
+  const wxChecked = new Set(OBS.map(x => x.psa + "|" + x.date));
+  const isEvent = k => o.obsDef === "fire" ? fireObs.has(k) : o.obsDef === "wx" ? wxObs.has(k) : (fireObs.has(k) || wxObs.has(k));
+  const yes = r => trigOf(r) ? true : (o.def === "hrvd" && r.dryness_code === "3");
+  const inR = d => d >= o.from && d <= o.to;
+  const inP = p => o.psas.has(String(p).toUpperCase());
+  const scored = FC.filter(r => inP(r.psa) && inR(r.valid_date) && r.valid_date < today && r.dryness_code !== "0"
+    && (o.obsDef === "fire" || wxChecked.has(r.psa + "|" + r.valid_date)));
+
+  const L = {}; for (let l = 1; l <= 7; l++) L[l] = { a: 0, b: 0, c: 0, d: 0 };
+  const cat = {}; ["1", "2", "3", "W", "B", "L", "WB"].forEach(k => cat[k] = { n: 0, f: 0 });
+  const per = {}, month = {}, outcomes = [];
+  for (const r of scored) {
+    const k = r.psa + "|" + r.valid_date, ev = isEvent(k), f = yes(r), s = L[+r.lead_day];
+    if (f && ev) s.a++; else if (f) s.b++; else if (ev) s.c++; else s.d++;
+    r._out = f && ev ? "Hit" : f ? "False alarm" : ev ? "Miss" : "Correct quiet";
+    if (+r.lead_day === o.lead) {
+      const c = cat[keyOf(r)]; if (c) { c.n++; if (ev) c.f++; }
+      const mo = month[r.valid_date.slice(0, 7)] ||= { a: 0, b: 0, c: 0, d: 0, days: new Set() };
+      mo.days.add(r.valid_date); if (f && ev) mo.a++; else if (f) mo.b++; else if (ev) mo.c++; else mo.d++;
+      if (r._out === "Miss" || r._out === "False alarm") outcomes.push(r);
+      const p = per[r.psa] ||= { a: 0, b: 0, c: 0, d: 0 };
+      if (f && ev) p.a++; else if (f) p.b++; else if (ev) p.c++; else p.d++;
+    }
+  }
+  const sc = s => ({ n: s.a + s.b + s.c + s.d, pod: s.a / (s.a + s.c), far: s.b / (s.a + s.b), csi: s.a / (s.a + s.b + s.c), bias: (s.a + s.b) / (s.a + s.c) });
+  const leadRows = scored.filter(r => +r.lead_day === o.lead);
+  const days = [...new Set(leadRows.map(r => r.valid_date))].sort();
+  const psas = [...new Set(FC.map(r => r.psa))].filter(inP).sort();
+  const sets = [...new Set(OBS.filter(x => inR(x.date) && inP(x.psa) && x.criteria_set).map(x => x.criteria_set))];
+  return { o, L, cat, per, month, outcomes, scored, inP, sc, days, psas, nPsa: new Set(leadRows.map(r => r.psa)).size, sets, isEvent, inR,
+           evWord: { fire: "Significant fire", wx: "High Risk weather", either: "Fire or High Risk weather" }[o.obsDef],
+           yesWord: o.def === "hrvd" ? "High Risk or Moderate Risk" : "High Risk only" };
+}
+
+// each section = { name (sheet), title, note, head:[...], rows:[[cell,...]] }, cell = value or {v, k(category), f("pct"|"dec")}
+function exportSections(D) {
+  const o = D.o, out = [], P = v => isFinite(v) ? { v, f: "pct" } : "", N = v => isFinite(v) ? { v, f: "dec" } : "";
+  const S = D.L[o.lead], X = D.sc(S);
+  const range = `${o.from === "0000-01-01" ? "start" : o.from} to ${o.to === "9999-12-31" ? "latest" : o.to}`;
+  out.summary = [
+    ["Report", "Southwest 7-Day Significant Fire Potential verification"],
+    ["Date range", range],
+    ["Days checked (Day " + o.lead + ")", D.days.length ? `${D.days.length} (${D.days[0]} to ${D.days[D.days.length - 1]})` : "none yet"],
+    ["PSAs", o.psas.size === PSAS.length ? `All (${PSAS.length})` : [...o.psas].sort().join(", ")],
+    ["Verified against", D.evWord + (o.obsDef !== "wx" && o.minA ? ` (fires of at least ${o.minA} acres)` : "")],
+    ["A \"yes\" forecast is", D.yesWord],
+    ["Criteria set(s) used", D.sets.join(", ") || "-"],
+    ["Created", new Date().toLocaleString("en-US", { timeZone: "America/Denver" }) + " MT"],
+  ];
+  if (o.inc.scores) {
+    out.push({ name: "Scores", title: `Hits and misses, Day ${o.lead} (all PSAs)`, note: "Each count is one PSA forecast for one day.",
+      head: ["Measure", "Value", "What it means"], rows: [
+        ["PSA forecasts checked", X.n, `${D.days.length} days x ${D.nPsa} PSAs`],
+        ["Hits", S.a, "forecast yes, event occurred"], ["False alarms", S.b, "forecast yes, nothing happened"],
+        ["Misses", S.c, "forecast no, event occurred"], ["Correct quiet days", S.d, "forecast no, nothing happened"],
+        ["Events caught (POD)", P(X.pod), "share of events that were forecast yes; higher is better"],
+        ["False alarm ratio (FAR)", P(X.far), "share of yes forecasts with no event; lower is better"],
+        ["Skill (CSI)", N(X.csi), "hits / (hits + misses + false alarms); 1 is perfect"],
+        ["Bias", N(X.bias), "yes forecasts / events; above 1 = over-forecasting"]] });
+    let tn = 0, tf = 0;
+    const cr = ["1", "2", "3", "W", "B", "L", "WB"].filter(k => k !== "WB" || D.cat.WB.n).map(k => {
+      const c = D.cat[k]; tn += c.n; tf += c.f; return [{ v: XCAT[k], k }, c.n, c.f, c.n - c.f, P(c.f / c.n)]; });
+    cr.push(["All categories", tn, tf, tn - tf, P(tf / tn)]);
+    out.push({ name: "By category", title: `What was issued, and how often ${D.evWord.toLowerCase()} followed (Day ${o.lead})`,
+      note: "The rate should rise from Little or No Risk to High Risk.", chart: true,
+      head: ["Issued as", "PSA forecasts", D.evWord, "None", "Rate"], rows: cr });
+    out.push({ name: "By lead time", title: "How skill changes with lead time", note: "Day 1 is the morning-of forecast; Day 7 was issued six days earlier.",
+      head: ["Forecast", "PSA forecasts checked", "Hits", "Misses", "False alarms", "Correct quiet", "Events caught", "False alarm ratio", "Skill (CSI)", "Bias"],
+      rows: [1, 2, 3, 4, 5, 6, 7].map(l => { const s = D.L[l], x = D.sc(s); return [`Day ${l}`, x.n, s.a, s.c, s.b, s.d, P(x.pod), P(x.far), N(x.csi), N(x.bias)]; }) });
+    out.push({ name: "By PSA", title: `By PSA (Day ${o.lead})`, note: "Each count is a day.",
+      head: ["PSA", "Days checked", "Yes forecasts", "Hits", "Misses", "False alarms", "Events caught", "False alarm ratio", "Skill (CSI)"],
+      rows: Object.keys(D.per).sort().map(p => { const s = D.per[p], x = D.sc(s); return [p, x.n, s.a + s.b, s.a, s.c, s.b, P(x.pod), P(x.far), N(x.csi)]; }) });
+  }
+  if (o.inc.month) {
+    out.push({ name: "By month", title: `Scores by month (Day ${o.lead})`, note: "Each count is one PSA forecast for one day.",
+      head: ["Month", "Days", "PSA forecasts", "Hits", "Misses", "False alarms", "Events caught", "False alarm ratio", "Skill (CSI)", "Bias"],
+      rows: Object.keys(D.month).sort().map(m => { const s = D.month[m], x = D.sc(s);
+        const label = new Date(m + "-15T12:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+        return [label, s.days.size, x.n, s.a, s.c, s.b, P(x.pod), P(x.far), N(x.csi), N(x.bias)]; }) });
+  }
+  if (o.inc.review) {
+    out.push({ name: "Misses & false alarms", title: `Misses and false alarms to review (Day ${o.lead})`,
+      note: "Miss = event occurred without a yes forecast. False alarm = yes forecast with no event.",
+      head: ["Date", "PSA", "Outcome", "Forecast", "Observed weather", "Fire"],
+      rows: D.outcomes.sort((a, b) => a.valid_date.localeCompare(b.valid_date) || a.psa.localeCompare(b.psa)).map(r => {
+        const ob = obsMap.get(r.psa + "|" + r.valid_date);
+        return [r.valid_date, r.psa, r._out, { v: XCAT[keyOf(r)], k: keyOf(r) }, ob ? (ob.observed || "none") : "not checked", fireSet.get(r.psa + "|" + r.valid_date) || ""]; }) });
+  }
+  if (o.inc.grid) {
+    const vd = [...new Set(FC.filter(r => +r.lead_day === o.lead && D.inR(r.valid_date)).map(r => r.valid_date))].sort();
+    out.push({ name: `Day ${o.lead} forecasts`, title: `Day ${o.lead} forecast by date and PSA`, grid: true,
+      note: "Category as issued. \"obs W/B/L\" = High Risk trigger observed that day; \"fire\" = significant fire recorded.",
+      head: ["Date", ...D.psas], rows: vd.map(d => [d, ...D.psas.map(p => {
+        const r = byPsaValidLead.get(`${p}|${d}|${o.lead}`); if (!r) return "";
+        const k = keyOf(r), ob = obsMap.get(p + "|" + d), fire = fireSet.get(p + "|" + d);
+        return { v: XSHORT[k] + (ob && ob.observed ? ` | obs ${ob.observed}` : "") + (fire ? " | fire" : ""), k };
+      })]) });
+  }
+  if (o.inc.evo) {
+    const keys = [...new Set(FC.filter(r => D.inP(r.psa) && D.inR(r.valid_date)).map(r => r.psa + "|" + r.valid_date))].sort((a, b) => {
+      const [pa, da] = a.split("|"), [pb, db] = b.split("|"); return pa.localeCompare(pb) || da.localeCompare(db); });
+    out.push({ name: "Forecast evolution", title: "Forecast evolution: what each day was forecast as it got closer", grid: true,
+      note: "Read left to right from 7 days out to the morning-of forecast. Changes column counts category changes along the way.",
+      head: ["PSA", "Date", "Day 7", "Day 6", "Day 5", "Day 4", "Day 3", "Day 2", "Day 1", "Changes", "Observed", "Fire"],
+      rows: keys.map(k => { const [p, d] = k.split("|"); const seq = [7, 6, 5, 4, 3, 2, 1].map(l => byPsaValidLead.get(`${p}|${d}|${l}`));
+        const ks = seq.filter(Boolean).map(keyOf); let ch = 0; for (let i = 1; i < ks.length; i++) if (ks[i] !== ks[i - 1]) ch++;
+        const ob = obsMap.get(p + "|" + d);
+        return [p, d, ...seq.map(r => r ? { v: XSHORT[keyOf(r)], k: keyOf(r) } : ""), ch, ob ? (ob.observed || "-") : "", fireSet.get(p + "|" + d) || ""]; }) });
+  }
+  if (o.inc.all) out.push({ name: "All forecasts", title: "All archived forecasts (Days 1-7)", excelOnly: true,
+    head: ["Issued", "Forecast day", "Valid date", "PSA", "Category"],
+    rows: FC.filter(r => D.inP(r.psa) && D.inR(r.valid_date)).map(r => [r.issue_date, +r.lead_day, r.valid_date, r.psa, { v: XCAT[keyOf(r)] || "", k: keyOf(r) }]) });
+  if (o.inc.wx) out.push({ name: "Observed weather", title: "Observed weather check (High Risk criteria)",
+    note: "Only PSA-days where a trigger was met or nearly met are listed in the PDF; Excel lists every day checked.",
+    head: ["Date", "PSA", "Criteria set", "Observed", "Wind stations", "Burn stations", "Min RH %", "Max wind mph", "Max gust mph", "Max temp F", "Haines"],
+    rows: OBS.filter(x => D.inP(x.psa) && D.inR(x.date)).sort((a, b) => a.date.localeCompare(b.date) || a.psa.localeCompare(b.psa)).map(x => [
+      x.date, x.psa, x.criteria_set || x.season || "", (x.observed || "") + (x.possible ? " " + x.possible : ""), x.wind_stations || "", x.burn_stations || "",
+      x.min_rh === "" || x.min_rh == null ? "" : Math.round(+x.min_rh), x.max_wind_mph === "" || x.max_wind_mph == null ? "" : Math.round(+x.max_wind_mph),
+      x.max_gust_mph === "" || x.max_gust_mph == null ? "" : Math.round(+x.max_gust_mph), x.max_temp_f === "" || x.max_temp_f == null ? "" : Math.round(+x.max_temp_f), x.haines === "" || x.haines == null ? "" : +x.haines]) });
+  if (o.inc.ltg) out.push({ name: "Lightning days", title: "Confirmed lightning days", head: ["Date", "PSA", "Note"],
+    rows: LTG.filter(x => x.date && D.inP(x.psa) && D.inR(x.date)).sort((a, b) => a.date.localeCompare(b.date) || a.psa.localeCompare(b.psa)).map(x => [x.date, x.psa.toUpperCase(), x.notes || ""]) });
+  if (o.inc.fires) out.push({ name: "Fires", title: "Recorded fires", head: ["Date", "PSA", "Fire name", "Acres", "Cause", "Notes"],
+    rows: FIRES.filter(f => D.inP(f.psa) && D.inR(f.date)).sort((a, b) => a.date.localeCompare(b.date)).map(f => [f.date, f.psa.toUpperCase(), f.fire_name || "", f.acres === "" ? "" : +f.acres, f.cause || "", f.notes || ""]) });
+  if (o.inc.crit && CFG && CFG.criteria_sets) {
+    const sets = Object.entries(CFG.criteria_sets).filter(([k]) => !k.startsWith("_"));
+    out.push({ name: "Criteria", title: "Criteria sets", note: "Thresholds used for the observed weather check.",
+      head: ["Setting", ...sets.map(([k]) => k)], rows: [
+        ["Description", ...sets.map(([, s]) => s.description || "")],
+        ["Wind: sustained at least (mph)", ...sets.map(([, s]) => s.wind.sustained_mph)],
+        ["Wind: or gusts at least (mph)", ...sets.map(([, s]) => s.wind.gust_mph)],
+        ["Wind: gusts for at least (hours)", ...sets.map(([, s]) => s.wind.gust_hours)],
+        ["Wind: RH at or below (%)", ...sets.map(([, s]) => s.wind.rh_max)],
+        ["Burn: max temp above typical by (F)", ...sets.map(([, s]) => s.burn_environment.degrees_above_typical)],
+        ["Burn: RH at or below (%)", ...sets.map(([, s]) => s.burn_environment.rh_max)],
+        ["Burn: Haines at least", ...sets.map(([, s]) => s.burn_environment.haines_min)],
+        ["Stations that must hit (most PSAs)", ...sets.map(([, s]) => s.stations_needed.default)],
+        ["Small PSA = this many stations or fewer", ...sets.map(([, s]) => s.stations_needed.small_psa_station_count)],
+        ["Small PSAs need", ...sets.map(([, s]) => s.stations_needed.small_psa_needed)]] });
+    out.push({ name: "Criteria history", title: "Which criteria set was in use", head: ["From", "Set in use", "Reason"],
+      rows: [...(CFG.schedule || [])].sort((a, b) => a.from.localeCompare(b.from)).map(e => [e.from, e.set, e.note || ""]) });
+  }
+  return out;
+}
+
+// ---- flat CSV: one row per PSA forecast, with what happened
+function buildCsv(D) {
+  const q = v => { v = String(v ?? ""); return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+  const head = ["valid_date", "psa", "forecast_day", "issued", "forecast_category", "trigger", "yes_forecast", "observed_triggers", "fire", "event", "outcome", "criteria_set"];
+  const rows = D.scored.slice().sort((a, b) => a.valid_date.localeCompare(b.valid_date) || a.psa.localeCompare(b.psa) || a.lead_day - b.lead_day).map(r => {
+    const ob = obsMap.get(r.psa + "|" + r.valid_date), k = r.psa + "|" + r.valid_date;
+    return [r.valid_date, r.psa, r.lead_day, r.issue_date, XCAT[keyOf(r)], trigOf(r), /Hit|False/.test(r._out) ? "yes" : "no",
+            ob ? ob.observed || "" : "", fireSet.get(k) || "", D.isEvent(k) ? "yes" : "no", r._out, ob ? ob.criteria_set || "" : ""]; });
+  return new Blob(["\ufeff" + [head, ...rows].map(r => r.map(q).join(",")).join("\r\n")], { type: "text/csv" });
+}
+
+// ---- minimal .xlsx writer (stored zip, inline strings, a few styles)
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {   // files: [{name, data: Uint8Array}]
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  const u16 = v => [v & 255, (v >>> 8) & 255], u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const head = [0x50, 0x4b, 3, 4, ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(sz), ...u32(sz), ...u16(nm.length), ...u16(0)];
+    parts.push(new Uint8Array(head), nm, f.data);
+    central.push(new Uint8Array([0x50, 0x4b, 1, 2, ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(crc), ...u32(sz), ...u32(sz),
+      ...u16(nm.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), nm);
+    off += head.length + nm.length + sz;
+  }
+  const cdSize = central.reduce((s, a) => s + a.length, 0);
+  const end = new Uint8Array([0x50, 0x4b, 5, 6, ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cdSize), ...u32(off), ...u16(0)]);
+  return new Blob([...parts, ...central, end], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+const xe = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, "");
+const XSTY = { head: 1, title: 2, pct: 3, dec: 4, note: 5, "1": 6, "2": 7, "3": 8, W: 9, B: 9, WB: 9, L: 10, "0": 11 };
+function colName(i) { let s = ""; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+function sheetXml(rows, widths, freezeRow) {
+  let x = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">`;
+  x += freezeRow ? `<sheetViews><sheetView workbookViewId="0"><pane ySplit="${freezeRow}" topLeftCell="A${freezeRow + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>` : "";
+  x += `<cols>${widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("")}</cols><sheetData>`;
+  rows.forEach((row, ri) => {
+    x += `<row r="${ri + 1}">`;
+    row.forEach((c, ci) => {
+      if (c === "" || c == null) return;
+      const ref = colName(ci) + (ri + 1), o = typeof c === "object" ? c : { v: c };
+      const st = o.s != null ? o.s : o.f ? XSTY[o.f] : o.k != null ? XSTY[o.k] : 0;
+      if (typeof o.v === "number" && isFinite(o.v)) x += `<c r="${ref}"${st ? ` s="${st}"` : ""}><v>${o.v}</v></c>`;
+      else x += `<c r="${ref}" t="inlineStr"${st ? ` s="${st}"` : ""}><is><t xml:space="preserve">${xe(o.v)}</t></is></c>`;
+    });
+    x += `</row>`;
+  });
+  return x + `</sheetData></worksheet>`;
+}
+function buildXlsx(summary, sections) {
+  const sheets = [];
+  const sumRows = [[{ v: "Southwest 7-Day Fire Potential Verification", s: 2 }], [], ...summary.map(([k, v]) => [{ v: k, s: 1 }, v])];
+  sheets.push({ name: "Summary", xml: sheetXml(sumRows, [28, 70], 0) });
+  const used = new Set(["Summary"]);
+  for (const sec of sections) {
+    let nm = sec.name.replace(/[\[\]:*?\/\\]/g, "-").slice(0, 31), i = 2; while (used.has(nm)) nm = sec.name.slice(0, 28) + " " + i++; used.add(nm);
+    const rows = [[{ v: sec.title, s: 2 }], sec.note ? [{ v: sec.note, s: 5 }] : [], sec.head.map(h => ({ v: h, s: 1 })), ...sec.rows];
+    const widths = sec.head.map((h, ci) => Math.min(48, Math.max(8, String(h).length + 2, ...sec.rows.slice(0, 400).map(r => {
+      const c = r[ci]; const v = c && typeof c === "object" ? c.v : c; return String(v ?? "").length + 2; }))));
+    sheets.push({ name: nm, xml: sheetXml(rows, widths, 3) });
+  }
+  const fills = ["E8E6E0", "5FB336", "FFFF40", "D9B46F", "FF8C00", "E81E1E", "B4B4B4"];
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<numFmts count="1"><numFmt numFmtId="164" formatCode="0.00"/></numFmts>
+<fonts count="4"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="14"/><name val="Calibri"/></font><font><i/><sz val="10"/><color rgb="FF646B64"/><name val="Calibri"/></font></fonts>
+<fills count="${2 + fills.length}"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>${fills.map(h => `<fill><patternFill patternType="solid"><fgColor rgb="FF${h}"/><bgColor indexed="64"/></patternFill></fill>`).join("")}</fills>
+<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="12"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+${[3, 4, 5, 6, 7, 8].map(f => `<xf numFmtId="0" fontId="0" fillId="${f}" borderId="0" xfId="0" applyFill="1"/>`).join("")}</cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const enc = new TextEncoder(), F = (name, s) => ({ name, data: enc.encode(s) });
+  return zipStore([
+    F("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`),
+    F("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`),
+    F("xl/workbook.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s, i) => `<sheet name="${xe(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets></workbook>`),
+    F("xl/_rels/workbook.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`),
+    F("xl/styles.xml", styles),
+    ...sheets.map((s, i) => F(`xl/worksheets/sheet${i + 1}.xml`, s.xml)),
+  ]);
+}
+
+// ---- PDF report (print layout)
+function pdfChart(D) {
+  const keys = ["1", "2", "3", "W", "B", "L"].concat(D.cat.WB.n ? ["WB"] : []);
+  const W = 560, H = 210, pl = 34, pt = 22, pb = 44, ph = H - pt - pb, mx = Math.max(1, ...keys.map(k => D.cat[k].n));
+  const slot = (W - pl) / keys.length, bw = Math.min(46, slot * .55), y = v => pt + ph - v / mx * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">`;
+  s += `<line x1="${pl}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#888"/><text x="0" y="12" font-size="9" fill="#555">PSA forecasts</text>`;
+  keys.forEach((k, i) => {
+    const c = D.cat[k], cx = pl + slot * i + slot / 2, x0 = cx - bw / 2, hev = c.f / mx * ph, hno = (c.n - c.f) / mx * ph;
+    if (c.n - c.f) s += `<rect x="${x0}" y="${y(c.n)}" width="${bw}" height="${hno}" fill="#${XHEX[k]}" fill-opacity=".35" stroke="#${XHEX[k]}"/>`;
+    if (c.f) s += `<rect x="${x0}" y="${y(c.f)}" width="${bw}" height="${hev}" fill="#${XHEX[k]}"/>`;
+    if (c.n) s += `<text x="${cx}" y="${y(c.n) - 5}" font-size="10" font-weight="bold" text-anchor="middle">${Math.round(c.f / c.n * 100)}%</text>`;
+    s += `<text x="${cx}" y="${H - pb + 14}" font-size="9" text-anchor="middle" fill="#333">${XSHORT[k]}</text><text x="${cx}" y="${H - pb + 26}" font-size="8.5" text-anchor="middle" fill="#666">n=${c.n}</text>`;
+  });
+  return s + `<rect x="${pl}" y="${H - 10}" width="9" height="9" fill="#555"/><text x="${pl + 13}" y="${H - 2}" font-size="9" fill="#333">${esc(D.evWord)} occurred</text>
+    <rect x="${pl + 170}" y="${H - 10}" width="9" height="9" fill="#555" fill-opacity=".35" stroke="#555"/><text x="${pl + 183}" y="${H - 2}" font-size="9" fill="#333">none</text></svg>`;
+}
+function pdfCell(c, grid) {
+  if (c === "" || c == null) return `<td></td>`;
+  const o = typeof c === "object" ? c : { v: c };
+  const v = o.f === "pct" ? Math.round(o.v * 100) + "%" : o.f === "dec" ? (+o.v).toFixed(2) : o.v;
+  if (grid && o.k != null) { const [cat, ...extra] = String(v).split(" | ");
+    return `<td style="background:#${XHEX[o.k]};${o.k === "L" ? "color:#fff;" : ""}">${esc(cat)}${extra.map(e => `<div class="pm">${esc(e)}</div>`).join("")}</td>`; }
+  if (o.k != null) return `<td><span class="pk" style="background:#${XHEX[o.k]}"></span>${esc(v)}</td>`;
+  return `<td>${esc(v)}</td>`;
+}
+function buildPdfHtml(D, summary, sections) {
+  let h = `<div class="ph"><h1>Southwest 7-Day Significant Fire Potential &mdash; Verification</h1>
+    <table class="pmeta">${summary.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</table></div>`;
+  for (const sec of sections) {
+    if (sec.excelOnly) continue;
+    let rows = sec.rows;
+    if (sec.name === "Observed weather") rows = rows.filter(r => r[3]);
+    const big = sec.grid || rows.length > 25 || sec.chart;
+    h += `<div class="psec ${sec.grid ? "pgrid" : ""} ${big ? "pbreak" : "pkeep"}"><h2>${esc(sec.title)}</h2>${sec.note ? `<p class="pn">${esc(sec.note)}</p>` : ""}`;
+    if (sec.chart) h += `<div class="pchart">${pdfChart(D)}</div>`;
+    h += rows.length ? `<table class="pt"><thead><tr>${sec.head.map(x => `<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>` +
+      rows.map(r => `<tr>${r.map(c => pdfCell(c, sec.grid)).join("")}</tr>`).join("") + `</tbody></table>` : `<p class="pn">None in this date range.</p>`;
+    h += `</div>`;
+  }
+  return h;
+}
+
+// ---- controls
+function initExport() {
+  const first = ISSUES[0] || todayMT();
+  $("exFrom").value = first; $("exTo").value = todayMT();
+  const go = async kind => {
+    const o = exportOpts(), err = $("exErr");
+    err.textContent = o.from > o.to ? "The From date is after the To date." : !o.psas.size ? "Pick at least one PSA."
+      : kind !== "csv" && !Object.values(o.inc).some(Boolean) ? "Pick at least one thing to include." : "";
+    if (err.textContent) return;
+    const D = exportData(o), secs = exportSections(D), stamp = `${o.from}_to_${o.to}`.replace(/0000-01-01|9999-12-31/g, "all");
+    if (kind === "xlsx" || kind === "csv") {
+      const blob = kind === "xlsx" ? buildXlsx(secs.summary, secs) : buildCsv(D), a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `SW-7day-verification_${stamp}.${kind}`;
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      $("exMsg").textContent = kind === "xlsx" ? "Excel file downloaded." : "CSV file downloaded.";
+    } else {
+      $("printReport").innerHTML = buildPdfHtml(D, secs.summary, secs);
+      const old = document.title; document.title = `SW-7day-verification_${stamp}`;
+      $("exMsg").textContent = "In the print window, set Destination to “Save as PDF”, then click Save.";
+      setTimeout(() => { window.print(); document.title = old; }, 50);
+    }
+  };
+  $("exXlsx").onclick = () => go("xlsx");
+  $("exCsv").onclick = () => go("csv");
+  $("exPsas").innerHTML = PSAS.map(p => `<label class="on"><input type="checkbox" value="${p}" checked>${p}</label>`).join("") || `<p class="note">PSAs appear after the first forecast is archived.</p>`;
+  $("exPsas").querySelectorAll("input").forEach(c => c.onchange = () => c.parentElement.classList.toggle("on", c.checked));
+  const setAll = v => $("exPsas").querySelectorAll("input").forEach(c => { c.checked = v; c.parentElement.classList.toggle("on", v); });
+  $("exPsaAll").onclick = () => setAll(true); $("exPsaNone").onclick = () => setAll(false);
+  $("exPdf").onclick = () => go("pdf");
+  $("exAcresCtl").style.display = $("exObs").value === "wx" ? "none" : "";
+  $("exObs").oninput = () => { $("exAcresCtl").style.display = $("exObs").value === "wx" ? "none" : ""; };
+  document.querySelectorAll("[data-exrange]").forEach(b => b.onclick = () => {
+    const t = todayMT(), n = +b.dataset.exrange;
+    $("exTo").value = t; $("exFrom").value = n > 0 ? addDays(t, -n) : n === -1 ? t.slice(0, 4) + "-01-01" : first;
+  });
+}
+
+// ------------------------------------------------------------------ shared helpers for Map + Analysis
+const OUTC = { "Hit": "var(--o-hit)", "False alarm": "var(--o-fa)", "Miss": "var(--o-miss)", "Correct quiet": "var(--o-quiet)" };
+const OUTL = { "Hit": "H", "False alarm": "F", "Miss": "M", "Correct quiet": "" };
+const CATFILL = { "0": "var(--gray)", "1": "var(--green)", "2": "var(--yellow)", "3": "var(--brown)", W: "var(--orange)", B: "var(--orange)", WB: "var(--orange)", L: "var(--red)" };
+const SEQ = ["#dbe8f5", "#a9c8e8", "#6fa1d4", "#3b76b8", "#1f4f8a"];          // one hue, light -> dark
+const DIV = ["#2b6cb0", "#8fb3dc", "#d9d6cf", "#f0b97a", "#d9731e"];          // under (blue) - even (gray) - over (orange)
+const pctS = x => isFinite(x) ? Math.round(x * 100) + "%" : "–";
+const decS = x => isFinite(x) ? x.toFixed(2) : "–";
+function vizCtx(prefix) {
+  const o = { from: $(prefix + "From").value || "0000-01-01", to: $(prefix + "To").value || "9999-12-31", lead: +$(prefix + "Lead").value,
+              obsDef: $(prefix + "Obs").value, def: $(prefix + "Yes").value, minA: +$(prefix + "Acres").value || 0, inc: {}, psas: new Set(PSAS) };
+  return exportData(o);
+}
+function tipAt(wrap, tip, html, el) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const wr = wrap.getBoundingClientRect(), gr = el.getBoundingClientRect();
+  const left = Math.min(Math.max(gr.left - wr.left + gr.width / 2 - tip.offsetWidth / 2, 0), Math.max(wr.width - tip.offsetWidth, 0));
+  tip.style.left = left + "px"; tip.style.top = Math.max(gr.top - wr.top - tip.offsetHeight - 6, 0) + "px";
+}
+function bindTips(wrap, tip, sel, htmlFor) {
+  wrap.querySelectorAll(sel).forEach(el => {
+    const show = () => tipAt(wrap, tip, htmlFor(el), el), hide = () => tip.style.opacity = 0;
+    el.addEventListener("mouseenter", show); el.addEventListener("focus", show);
+    el.addEventListener("mouseleave", hide); el.addEventListener("blur", hide);
+  });
+}
+function openPsaScorecard(p) {
+  SC_PSA = p; document.querySelector('nav button[data-tab="score"]').click(); renderScore();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ------------------------------------------------------------------ Map
+let PSAGEO = null, MAPPROJ = null, MAPPLAY = null;
+function mapProject() {
+  if (MAPPROJ || !PSAGEO) return MAPPROJ;
+  const feats = PSAGEO.features.filter(f => f.geometry && f.properties && f.properties.psa);
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  const polys = f => f.geometry.type === "MultiPolygon" ? f.geometry.coordinates : [f.geometry.coordinates];
+  feats.forEach(f => polys(f).forEach(p => p[0].forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); })));
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), W = 760, pad = 12;
+  const sc = (W - 2 * pad) / ((x1 - x0) * k), H = Math.round((y1 - y0) * sc + 2 * pad);
+  const P = ([x, y]) => [pad + (x - x0) * k * sc, pad + (y1 - y) * sc];
+  const shapes = feats.map(f => {
+    let best = null, bestA = -1;
+    const d = polys(f).map(poly => {
+      const ring = poly[0].map(P);
+      let a = 0, cx = 0, cy = 0;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const cr = ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1]; a += cr; cx += (ring[j][0] + ring[i][0]) * cr; cy += (ring[j][1] + ring[i][1]) * cr;
+      }
+      if (Math.abs(a) > bestA) { bestA = Math.abs(a); best = a ? [cx / (3 * a), cy / (3 * a)] : ring[0]; }
+      return poly.map(r => "M" + r.map(P).map(q => q[0].toFixed(1) + "," + q[1].toFixed(1)).join("L") + "Z").join("");
+    }).join("");
+    return { psa: f.properties.psa, d, c: best, area: bestA };
+  });
+  return MAPPROJ = { W, H, shapes };
+}
+
+function initMap() {
+  const dates = [...new Set(FC.map(r => r.valid_date))].sort();
+  const t = todayMT(), past = dates.filter(d => d < t);
+  $("mpDate").value = past.length ? past[past.length - 1] : (dates[0] || t);
+  $("mpFrom").value = ISSUES[0] || t; $("mpTo").value = t;
+  ["mpView", "mpDate", "mpLead", "mpObs", "mpYes", "mpAcres", "mpMetric", "mpFrom", "mpTo"].forEach(id => $(id).oninput = () => { if (id !== "mpDate") stopPlay(); renderMap(); });
+  const step = n => {
+    const ds = [...new Set(FC.filter(r => +r.lead_day === +$("mpLead").value).map(r => r.valid_date))].sort();
+    if (!ds.length) return false;
+    let i = ds.indexOf($("mpDate").value); i = i < 0 ? ds.findIndex(d => d > $("mpDate").value) : i + n;
+    if (i < 0 || i >= ds.length) return false;
+    $("mpDate").value = ds[i]; renderMap(); return true;
+  };
+  $("mpPrev").onclick = () => { stopPlay(); step(-1); };
+  $("mpNext").onclick = () => { stopPlay(); step(1); };
+  $("mpPlay").onclick = () => {
+    if (MAPPLAY) return stopPlay();
+    $("mpPlay").textContent = "Pause";
+    MAPPLAY = setInterval(() => { if (!step(1)) stopPlay(); }, 900);
+  };
+  renderMap();
+}
+function stopPlay() { if (MAPPLAY) clearInterval(MAPPLAY); MAPPLAY = null; if ($("mpPlay")) $("mpPlay").textContent = "Play"; }
+
+function renderMap() {
+  const view = $("mpView").value, M = mapProject(), box = $("mpBox");
+  document.querySelectorAll("[data-mp]").forEach(el => el.style.display = el.dataset.mp.split(" ").includes(view) ? "" : "none");
+  if (!M || !M.shapes.length) {
+    box.innerHTML = `<div class="empty">The PSA map appears after the nightly weather check has run once (it saves the PSA boundaries to <code>data/psa_polygons.geojson</code>).</div>`; return;
+  }
+  const date = $("mpDate").value, lead = +$("mpLead").value;
+  let info = {}, legend = "", title = "";
+  if (view === "forecast" || view === "outcome") {
+    const D = vizCtx("mp");
+    const out = new Map(D.scored.filter(r => +r.lead_day === lead).map(r => [r.psa + "|" + r.valid_date, r._out]));
+    title = `${view === "forecast" ? "Forecast as issued" : "Outcome"} for ${date ? fmtDay(date) : "–"}, Day ${lead}`;
+    for (const s of M.shapes) {
+      const r = byPsaValidLead.get(`${s.psa}|${date}|${lead}`), ob = obsMap.get(s.psa + "|" + date), fire = fireSet.get(s.psa + "|" + date);
+      const oc = out.get(s.psa + "|" + date);
+      const k = r ? keyOf(r) : null;
+      info[s.psa] = view === "forecast"
+        ? { fill: k ? CATFILL[k] : "transparent", dash: !k, big: k && CAT[k].letter && CAT[k].letter !== "!" ? CAT[k].letter : k === "WB" ? "W/B" : "",
+            small: ob && ob.observed ? "obs " + ob.observed : "", fire: !!fire, dark: k === "L",
+            tip: `<b>${s.psa}</b><br>${k ? CAT[k].label : "No forecast archived"}${ob ? `<br>Observed: ${ob.observed || "no High Risk trigger"}` : ""}${fire ? `<br>Fire: ${esc(fire)}` : ""}${oc ? `<br>Outcome: <b>${oc}</b>` : ""}` }
+        : { fill: oc ? OUTC[oc] : "transparent", dash: !oc, big: oc ? OUTL[oc] : "", small: "", fire: !!fire, dark: oc && oc !== "Correct quiet", quiet: oc === "Correct quiet",
+            tip: `<b>${s.psa}</b><br>${oc ? `<b>${oc}</b>` : date >= todayMT() ? "Not verified yet" : D.o.obsDef === "fire" ? "No forecast" : "Not checked against weather"}<br>Forecast: ${k ? CAT[k].label : "–"}${ob ? `<br>Observed: ${ob.observed || "none"}` : ""}${fire ? `<br>Fire: ${esc(fire)}` : ""}` };
+    }
+    legend = view === "forecast"
+      ? CAT_ORDER.filter(k => k !== "0").map(k => `<span><i class="sw ${CAT[k].cls}">${CAT[k].letter}</i>${CAT[k].label}</span>`).join("") + `<span><i class="obk">obs</i>Trigger observed</span><span><i class="dot"></i>Fire</span>`
+      : Object.keys(OUTC).map(k => `<span><i class="sw" style="background:${OUTC[k]};color:#fff">${OUTL[k]}</i>${k}</span>`).join("") + `<span><i class="sw" style="border:1.5px dashed var(--muted)"></i>Not verified</span>`;
+  } else {
+    const D = vizCtx("mp"), metric = $("mpMetric").value;
+    title = `${$("mpMetric").selectedOptions[0].text}, Day ${lead}, ${fmtDay(D.o.from === "0000-01-01" ? (ISSUES[0] || todayMT()) : D.o.from)} to ${fmtDay(D.o.to > todayMT() ? todayMT() : D.o.to)}`;
+    const vals = {};
+    for (const s of M.shapes) {
+      const p = D.per[s.psa]; if (!p) continue; const x = D.sc(p);
+      vals[s.psa] = metric === "events" ? p.a + p.c : metric === "yes" ? p.a + p.b : x[metric];
+      if (metric === "bias" && p.a + p.c === 0) vals[s.psa] = p.a + p.b ? "noev" : NaN;
+    }
+    const fin = Object.values(vals).filter(v => typeof v === "number" && isFinite(v)), mx = Math.max(1e-9, ...fin);
+    const color = v => {
+      if (v === "noev") return "transparent";
+      if (!isFinite(v)) return "transparent";
+      if (metric === "bias") return v < 0.67 ? DIV[0] : v < 0.9 ? DIV[1] : v <= 1.1 ? DIV[2] : v <= 1.5 ? DIV[3] : DIV[4];
+      const f = ["pod", "far", "csi"].includes(metric) ? v : v / mx;
+      return SEQ[Math.min(4, Math.floor(f * 5))];
+    };
+    const fmt = v => v === "noev" ? "no events" : !isFinite(v) ? "–" : ["pod", "far"].includes(metric) ? pctS(v) : ["csi", "bias"].includes(metric) ? decS(v) : v;
+    for (const s of M.shapes) {
+      const v = vals[s.psa], p = D.per[s.psa], x = p ? D.sc(p) : null;
+      const c = color(v);
+      info[s.psa] = { fill: c, dash: c === "transparent", big: fmt(v), small: "", fire: false, dark: c === SEQ[3] || c === SEQ[4] || c === DIV[0] || c === DIV[4],
+        tip: `<b>${s.psa}</b>${p ? `<br>Days checked: ${x.n}<br>Hits ${p.a} · Misses ${p.c} · False alarms ${p.b}<br>Events caught ${pctS(x.pod)} · False alarms ${pctS(x.far)}<br>Skill ${decS(x.csi)} · Bias ${decS(x.bias)}` : "<br>No days checked"}` };
+    }
+    legend = metric === "bias"
+      ? [["under 0.67", 0], ["0.67–0.9", 1], ["0.9–1.1 (about right)", 2], ["1.1–1.5", 3], ["over 1.5", 4]].map(([l, i]) => `<span><i class="sw" style="background:${DIV[i]}"></i>${l}</span>`).join("") + `<span class="note">below 1 = under-forecasting, above 1 = over-forecasting</span>`
+      : SEQ.map((c, i) => `<span><i class="sw" style="background:${c}"></i>${metric === "csi" ? `${(i * .2).toFixed(1)}–${((i + 1) * .2).toFixed(1)}` : ["pod", "far"].includes(metric) ? `${i * 20}–${(i + 1) * 20}%` : i === 0 ? "fewest" : i === 4 ? "most" : ""}</span>`).join("") +
+        `<span class="note">${{ pod: "higher is better", far: "lower is better", csi: "higher is better", events: "PSA-days with an event", yes: "yes forecasts issued" }[metric]}</span>`;
+  }
+  let svg = `<svg viewBox="0 0 ${M.W} ${M.H}" role="img" aria-label="${esc(title)}">`;
+  for (const s of M.shapes) {
+    const i = info[s.psa] || {};
+    svg += `<g class="psa" tabindex="0" data-psa="${s.psa}"><path d="${s.d}" fill="${i.fill}" fill-rule="evenodd" class="${i.dash ? "nodata" : ""}"/></g>`;
+  }
+  for (const s of M.shapes) {
+    const i = info[s.psa] || {}, [cx, cy] = s.c, small = s.area < 900;
+    const ink = i.dark ? "#fff" : i.quiet ? "var(--ink)" : "#1f2420", halo = i.dash ? "var(--panel)" : "none";
+    svg += `<g class="lbl" pointer-events="none"><text x="${cx}" y="${cy - (i.big ? 5 : 0)}" text-anchor="middle" fill="${i.dash ? "var(--muted)" : ink}" style="font:600 ${small ? 9 : 11}px 'IBM Plex Mono',monospace;paint-order:stroke;stroke:${halo};stroke-width:3">${s.psa}</text>` +
+      (i.big !== "" && i.big != null ? `<text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="${ink}" style="font:700 ${small ? 10 : 13}px 'IBM Plex Mono',monospace">${esc(i.big)}</text>` : "") +
+      (i.small ? `<text x="${cx}" y="${cy + 23}" text-anchor="middle" style="font:600 9px 'IBM Plex Sans',sans-serif" fill="${ink}">${esc(i.small)}</text>` : "") +
+      (i.fire ? `<circle cx="${cx + 20}" cy="${cy - 9}" r="5" fill="#111" stroke="#fff" stroke-width="2"/>` : "") + `</g>`;
+  }
+  svg += `</svg>`;
+  box.innerHTML = `<h2 style="margin-bottom:8px">${esc(title)}</h2><div class="mapwrap" id="mpWrap">${svg}<div class="tip" id="mpTip"></div></div><div class="legend">${legend}</div>
+    <p class="note" style="margin-top:8px">Hover a PSA for details; click to open its scorecard.</p>`;
+  bindTips($("mpWrap"), $("mpTip"), "g.psa", el => (info[el.dataset.psa] || {}).tip || el.dataset.psa);
+  $("mpWrap").querySelectorAll("g.psa").forEach(g => { g.onclick = () => openPsaScorecard(g.dataset.psa); g.onkeydown = e => { if (e.key === "Enter") openPsaScorecard(g.dataset.psa); }; });
+}
+
+// ------------------------------------------------------------------ Analysis
+function initAnalysis() {
+  $("anFrom").value = ISSUES[0] || todayMT(); $("anTo").value = todayMT();
+  ["anObs", "anLead", "anYes", "anAcres", "anFrom", "anTo"].forEach(id => $(id).oninput = renderAnalysis);
+  renderAnalysis();
+}
+function svgBars(cats, series, opts) {   // cats: labels; series: [{name, color, vals, fmt}]
+  const W = opts.w || 640, H = opts.h || 260, pl = 40, pr = 8, pt = 26, pb = 46, ph = H - pt - pb;
+  const mx = opts.max || Math.max(1e-9, ...series.flatMap(s => s.vals.filter(isFinite)));
+  const slot = (W - pl - pr) / cats.length, gw = Math.min(30, slot * 0.7 / series.length), y = v => pt + ph - v / mx * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "")}">`;
+  for (let i = 0; i <= 4; i++) { const v = mx * i / 4; s += `<line class="${i ? "grid" : "base"}" x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${pl - 6}" y="${y(v) + 4}" text-anchor="end">${opts.yfmt ? opts.yfmt(v) : Math.round(v)}</text>`; }
+  cats.forEach((c, ci) => {
+    const cx = pl + slot * ci + slot / 2, x0 = cx - gw * series.length / 2 - (series.length - 1);
+    s += `<g class="col" tabindex="0" data-i="${ci}">`;
+    series.forEach((se, si) => {
+      const v = se.vals[ci], x = x0 + si * (gw + 2);
+      if (isFinite(v) && v > 0) { const top = y(v), h = y(0) - top, r = Math.min(4, h);
+        s += `<path class="seg" fill="${se.color}" d="M${x},${y(0)} V${top + r} Q${x},${top} ${x + r},${top} H${x + gw - r} Q${x + gw},${top} ${x + gw},${top + r} V${y(0)} Z"/>`; }
+      if (opts.labels && isFinite(v)) s += `<text class="val" x="${x + gw / 2}" y="${y(v) - 6}" text-anchor="middle" style="font-size:10.5px">${se.fmt(v)}</text>`;
+    });
+    const lines = String(c).split("\n");
+    lines.forEach((ln, li) => s += `<text class="ax" x="${cx}" y="${H - pb + 16 + li * 14}" text-anchor="middle">${esc(ln)}</text>`);
+    s += `<rect class="hit" x="${pl + slot * ci}" y="${pt - 20}" width="${slot}" height="${ph + 20}"/></g>`;
+  });
+  return s + `</svg>`;
+}
+function svgLine(xlabels, vals, opts) {
+  const W = opts.w || 520, H = opts.h || 220, pl = 40, pr = 12, pt = 18, pb = 34, ph = H - pt - pb;
+  const fin = vals.filter(isFinite), mx = Math.max(opts.min1 ? 1 : 0, ...(fin.length ? fin : [1])) * 1.1, mn = 0;
+  const x = i => pl + (xlabels.length < 2 ? (W - pl - pr) / 2 : i * (W - pl - pr) / (xlabels.length - 1)), y = v => pt + ph - (v - mn) / (mx - mn) * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "")}">`;
+  for (let i = 0; i <= 4; i++) { const v = mn + (mx - mn) * i / 4; s += `<line class="${i ? "grid" : "base"}" x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${pl - 6}" y="${y(v) + 4}" text-anchor="end">${v.toFixed(mx < 0.6 ? 2 : mx < 3 ? 1 : 0)}</text>`; }
+  if (opts.ref != null && opts.ref <= mx) s += `<line x1="${pl}" x2="${W - pr}" y1="${y(opts.ref)}" y2="${y(opts.ref)}" stroke="var(--muted)" stroke-dasharray="4 4"/><text class="ax" x="${W - pr}" y="${y(opts.ref) - 5}" text-anchor="end">${esc(opts.refLabel || "")}</text>`;
+  let d = "", pen = false;
+  vals.forEach((v, i) => { if (isFinite(v)) { d += (pen ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1); pen = true; } else pen = false; });
+  s += `<path d="${d}" fill="none" stroke="${opts.color}" stroke-width="2" stroke-linejoin="round"/>`;
+  const every = Math.max(1, Math.ceil(xlabels.length / 7));
+  vals.forEach((v, i) => {
+    if (isFinite(v)) s += `<g class="pt" tabindex="0" data-i="${i}"><circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${opts.color}" stroke="var(--panel)" stroke-width="2"/><circle cx="${x(i)}" cy="${y(v)}" r="12" fill="transparent"/></g>`;
+    if (i % every === 0) s += `<text class="ax" x="${x(i)}" y="${H - 12}" text-anchor="middle">${esc(xlabels[i])}</text>`;
+  });
+  return s + `</svg>`;
+}
+
+let AN_VAR = "erc";
+function renderAnalysis() {
+  const D = vizCtx("an"), lead = D.o.lead, out = $("anBody");
+  $("anAcresCtl").style.display = D.o.obsDef === "wx" ? "none" : "";
+  const rows = D.scored.filter(r => +r.lead_day === lead);
+  if (!rows.length) { out.innerHTML = `<div class="card"><div class="empty">Nothing to analyze yet for Day ${lead} in this range. Views fill in as past days are verified.</div></div>`; return; }
+  const ev = D.evWord.toLowerCase();
+  let h = "";
+
+  // ---- 1. reliability by conditions
+  const vsel = AN_VAR;
+  const BINS = {
+    erc: { label: "ERC (PSA median)", phrase: "ERC", get: o => o && o.erc !== "" && o.erc != null ? +o.erc : NaN, edges: [20, 40, 60, 80], names: ["under 20", "20–39", "40–59", "60–79", "80+"] },
+    rh: { label: "Minimum RH", phrase: "minimum RH", get: o => o && o.min_rh !== "" && o.min_rh != null ? +o.min_rh : NaN, edges: [9, 16, 26, 41], names: ["8% or less", "9–15%", "16–25%", "26–40%", "over 40%"] },
+    gust: { label: "Peak wind gust", phrase: "peak wind gust", get: o => o && o.max_gust_mph !== "" && o.max_gust_mph != null ? +o.max_gust_mph : NaN, edges: [20, 30, 40, 50], names: ["under 20 mph", "20–29", "30–39", "40–49", "50+ mph"] },
+  }[vsel];
+  const bins = BINS.names.map(() => ({ n: 0, e: 0, y: 0, hr: 0 }));
+  let used = 0;
+  for (const r of rows) {
+    const v = BINS.get(obsMap.get(r.psa + "|" + r.valid_date)); if (!isFinite(v)) continue;
+    let b = BINS.edges.findIndex(e => v < e); if (b < 0) b = BINS.edges.length;
+    const B = bins[b]; B.n++; used++;
+    if (r._out === "Hit" || r._out === "Miss") B.e++;
+    if (r._out === "Hit" || r._out === "False alarm") B.y++;
+    if (trigOf(r)) B.hr++;
+  }
+  const relCh = used ? svgBars(BINS.names.map(n => n.replace(" ", "\n")), [
+      { name: `${D.evWord} rate`, color: "var(--s1)", vals: bins.map(b => b.n ? b.e / b.n : NaN), fmt: pctS },
+      { name: "Forecast yes rate", color: "var(--s2)", vals: bins.map(b => b.n ? b.y / b.n : NaN), fmt: pctS }],
+      { max: 1, yfmt: v => Math.round(v * 100) + "%", labels: true, label: "Event rate and forecast yes rate by " + BINS.label }) : "";
+  h += `<div class="card"><h2>Reliability by conditions</h2>
+    <p class="note">Day ${lead} PSA forecasts grouped by the observed ${BINS.phrase} that day. If forecasts track conditions well, the forecast-yes rate rises with the ${ev} rate.</p>
+    <div class="row" style="margin-top:10px"><div class="ctl"><label for="anVar">Group by</label><select id="anVar">
+      <option value="erc" ${vsel === "erc" ? "selected" : ""}>ERC</option><option value="rh" ${vsel === "rh" ? "selected" : ""}>Minimum RH</option><option value="gust" ${vsel === "gust" ? "selected" : ""}>Peak wind gust</option></select></div></div>
+    ${used ? `<div class="keyrow"><span><i class="kev" style="background:var(--s1);opacity:1"></i>${esc(D.evWord)} rate</span><span><i class="kev" style="background:var(--s2)"></i>Forecast &ldquo;yes&rdquo; rate</span></div>
+    <div class="stack"><div class="chartwrap" id="anRel">${relCh}<div class="tip" id="anRelTip"></div></div>
+    <div class="scroll"><table class="num"><tr><th>${esc(BINS.label)}</th><th>PSA forecasts</th><th>${esc(D.evWord)}</th><th>Rate</th><th>Forecast yes</th><th>High Risk</th></tr>
+    ${bins.map((b, i) => `<tr><td>${BINS.names[i]}</td><td>${b.n}</td><td>${b.e}</td><td>${pctS(b.e / b.n)}</td><td>${pctS(b.y / b.n)}</td><td>${pctS(b.hr / b.n)}</td></tr>`).join("")}</table></div></div>`
+    : `<div class="empty">No ${BINS.phrase} data yet for these days.${vsel === "erc" ? " ERC is collected by the nightly weather check from now on." : ""}</div>`}
+    ${vsel === "rh" || vsel === "gust" ? `<p class="note">When verifying against High Risk weather, RH and wind are part of the event definition, so expect a strong relationship; verifying against fires is the more independent test.</p>` : ""}</div>`;
+
+  // ---- 2. calendar heat map
+  const dates = [...new Set(rows.map(r => r.valid_date))].sort();
+  const allDates = []; if (dates.length) for (let d = dates[0]; d <= dates[dates.length - 1]; d = addDays(d, 1)) allDates.push(d);
+  const om = new Map(rows.map(r => [r.psa + "|" + r.valid_date, r]));
+  const cw = 15, chh = 18, lw = 46, top = 30, W = lw + allDates.length * cw + 4, H = top + PSAS.length * chh + 4;
+  let cal = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Outcome calendar by PSA">`;
+  allDates.forEach((d, i) => { if (i === 0 || d.endsWith("-01")) cal += `<text class="ax" x="${lw + i * cw}" y="12" style="font-size:11px">${new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" })}</text>`;
+    if (new Date(d + "T12:00:00Z").getUTCDay() === 1) cal += `<text class="ax" x="${lw + i * cw + cw / 2}" y="${top - 5}" text-anchor="middle" style="font-size:9px">${+d.slice(8)}</text>`; });
+  PSAS.forEach((p, pi) => {
+    cal += `<text class="ax" x="0" y="${top + pi * chh + 13}" style="font:11px 'IBM Plex Mono',monospace">${p}</text>`;
+    allDates.forEach((d, di) => {
+      const r = om.get(p + "|" + d), o = r && r._out, x = lw + di * cw, y = top + pi * chh;
+      cal += o ? `<g class="cc" tabindex="-1" data-k="${p}|${d}"><rect x="${x}" y="${y}" width="${cw - 2}" height="${chh - 2}" rx="2" fill="${OUTC[o]}"/>${OUTL[o] ? `<text x="${x + (cw - 2) / 2}" y="${y + 12}" text-anchor="middle" fill="#fff" style="font:700 9px 'IBM Plex Mono',monospace" pointer-events="none">${OUTL[o]}</text>` : ""}</g>`
+               : `<rect x="${x + 0.5}" y="${y + 0.5}" width="${cw - 3}" height="${chh - 3}" rx="2" fill="none" stroke="var(--line)"/>`;
+    });
+  });
+  cal += `</svg>`;
+  h += `<div class="card"><h2>Calendar: outcome by PSA and day</h2>
+    <p class="note">Day ${lead} forecasts. Look for runs of the same color: clusters of misses or false alarms point to a pattern or a criteria problem.</p>
+    <div class="legend" style="margin:8px 0">${Object.keys(OUTC).map(k => `<span><i class="sw" style="background:${OUTC[k]};color:#fff">${OUTL[k]}</i>${k}</span>`).join("")}<span><i class="sw" style="border:1px solid var(--line)"></i>Not verified</span></div>
+    <div class="scroll"><div class="chartwrap calwrap" id="anCal" style="width:max-content">${cal}<div class="tip" id="anCalTip"></div></div></div></div>`;
+
+  // ---- 3. forecast consistency
+  const cons = {};
+  const tgt = [...new Set(FC.filter(r => r.valid_date >= D.o.from && r.valid_date <= D.o.to).map(r => r.psa + "|" + r.valid_date))];
+  for (const k of tgt) {
+    const [p, d] = k.split("|"), seq = [7, 6, 5, 4, 3, 2, 1].map(l => byPsaValidLead.get(`${p}|${d}|${l}`)).filter(Boolean);
+    if (seq.length < 3) continue;
+    const ks = seq.map(keyOf), hr = seq.map(r => !!trigOf(r));
+    let ch = 0, hrch = 0; for (let i = 1; i < ks.length; i++) { if (ks[i] !== ks[i - 1]) ch++; if (hr[i] !== hr[i - 1]) hrch++; }
+    const c = cons[p] ||= { n: 0, ch: 0, any: 0, flip: 0 };
+    c.n++; c.ch += ch; if (ch) c.any++; if (hrch >= 2) c.flip++;
+  }
+  const cp = Object.keys(cons).sort();
+  h += `<div class="card"><h2>Forecast consistency</h2>
+    <p class="note">For each target date with at least 3 forecasts archived (Day 7 &rarr; Day 1): how often the category changed along the way. A High Risk flip-flop is High Risk added then removed, or removed then added back.</p>
+    ${cp.length ? `<div class="stack"><div class="chartwrap" id="anCons">${svgBars(cp, [{ name: "Average changes", color: "var(--s1)", vals: cp.map(p => cons[p].ch / cons[p].n), fmt: v => v.toFixed(1) }],
+        { labels: true, yfmt: v => v.toFixed(1), label: "Average category changes per target date by PSA", h: 240 })}<div class="tip" id="anConsTip"></div></div>
+    <div class="scroll"><table class="num"><tr><th>PSA</th><th>Target dates</th><th>Avg changes</th><th>Changed at least once</th><th>High Risk flip-flops</th></tr>
+      ${cp.map(p => { const c = cons[p]; return `<tr><td>${p}</td><td>${c.n}</td><td>${(c.ch / c.n).toFixed(1)}</td><td>${pctS(c.any / c.n)}</td><td>${c.flip}</td></tr>`; }).join("")}</table></div></div>`
+      : `<div class="empty">Needs at least 3 archived forecasts for the same target date (about 3 days of archiving).</div>`}</div>`;
+
+  // ---- 4. weekly trend
+  const wk = {};
+  for (const r of rows) {
+    const dt = new Date(r.valid_date + "T12:00:00Z"), mon = addDays(r.valid_date, -((dt.getUTCDay() + 6) % 7));
+    const w = wk[mon] ||= { a: 0, b: 0, c: 0, d: 0 };
+    if (r._out === "Hit") w.a++; else if (r._out === "False alarm") w.b++; else if (r._out === "Miss") w.c++; else w.d++;
+  }
+  const wks = Object.keys(wk).sort(), wl = wks.map(w => new Date(w + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }));
+  const csi = wks.map(w => D.sc(wk[w]).csi), bias = wks.map(w => D.sc(wk[w]).bias);
+  h += `<div class="card"><h2>Season trend by week</h2>
+    <p class="note">Day ${lead} skill and bias for each week (weeks start Monday). Watch for changes after a criteria switch or a shift in fire season.</p>
+    <div class="two" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:10px">
+      <div><h3 style="margin-top:0">Skill (CSI) &mdash; higher is better</h3><div class="chartwrap" id="anCsi">${svgLine(wl, csi, { color: "var(--s1)", label: "Weekly CSI" })}<div class="tip" id="anCsiTip"></div></div></div>
+      <div><h3 style="margin-top:0">Bias &mdash; 1 is about right</h3><div class="chartwrap" id="anBias">${svgLine(wl, bias, { color: "var(--s2)", ref: 1, refLabel: "1 = even", min1: true, label: "Weekly bias" })}<div class="tip" id="anBiasTip"></div></div></div>
+    </div>
+    <details class="more" style="margin-top:10px"><summary>Table</summary><div class="scroll"><table class="num"><tr><th>Week of</th><th>Hits</th><th>Misses</th><th>False alarms</th><th>Correct quiet</th><th>Skill (CSI)</th><th>Bias</th></tr>
+      ${wks.map((w, i) => `<tr><td>${wl[i]}</td><td>${wk[w].a}</td><td>${wk[w].c}</td><td>${wk[w].b}</td><td>${wk[w].d}</td><td>${decS(csi[i])}</td><td>${decS(bias[i])}</td></tr>`).join("")}</table></div></details></div>`;
+
+  out.innerHTML = h;
+  $("anVar").oninput = () => { AN_VAR = $("anVar").value; renderAnalysis(); };
+  if ($("anRel")) bindTips($("anRel"), $("anRelTip"), ".col", el => { const b = bins[+el.dataset.i];
+    return `<b>${BINS.label}: ${BINS.names[+el.dataset.i]}</b><br>${b.n} PSA forecasts<br>${esc(D.evWord)}: <b>${b.e}</b> (${pctS(b.e / b.n)})<br>Forecast yes: <b>${b.y}</b> (${pctS(b.y / b.n)})`; });
+  bindTips($("anCal"), $("anCalTip"), ".cc", el => { const [p, d] = el.dataset.k.split("|"), r = om.get(el.dataset.k), ob = obsMap.get(el.dataset.k);
+    return `<b>${p} · ${fmtDay(d)}</b><br>${r._out}<br>Forecast: ${CAT[keyOf(r)].label}${ob ? `<br>Observed: ${ob.observed || "none"}` : ""}${fireSet.get(el.dataset.k) ? `<br>Fire: ${esc(fireSet.get(el.dataset.k))}` : ""}`; });
+  $("anCal").querySelectorAll(".cc").forEach(g => g.addEventListener("mouseenter", () => g.querySelector("rect").setAttribute("stroke", "var(--ink)")));
+  $("anCal").querySelectorAll(".cc").forEach(g => g.addEventListener("mouseleave", () => g.querySelector("rect").removeAttribute("stroke")));
+  if ($("anCons")) bindTips($("anCons"), $("anConsTip"), ".col", el => { const p = cp[+el.dataset.i], c = cons[p];
+    return `<b>${p}</b><br>${c.n} target dates<br>Average changes: <b>${(c.ch / c.n).toFixed(1)}</b><br>Changed at least once: ${pctS(c.any / c.n)}<br>High Risk flip-flops: ${c.flip}`; });
+  const wTip = (arr, name, f) => el => { const i = +el.dataset.i, w = wk[wks[i]];
+    return `<b>Week of ${wl[i]}</b><br>${name}: <b>${f(arr[i])}</b><br>Hits ${w.a} · Misses ${w.c} · False alarms ${w.b}`; };
+  bindTips($("anCsi"), $("anCsiTip"), ".pt", wTip(csi, "Skill (CSI)", decS));
+  bindTips($("anBias"), $("anBiasTip"), ".pt", wTip(bias, "Bias", decS));
+}
 
 // ------------------------------------------------------------------ boot
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
@@ -890,6 +1773,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   [FC, FIRES, OBS, LTG, CFG] = await Promise.all([getCSV("data/forecasts.csv"), getCSV("data/fires.csv"),
     getCSV("data/observed.csv"), getCSV("data/lightning.csv"),
     fetch("config/criteria.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)]);
+  PSAGEO = await fetch("data/psa_polygons.geojson?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
   FIRES = FIRES.filter(f => f.date && f.psa);
 
   // merge hand-confirmed lightning into the observed rows
@@ -920,10 +1804,13 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 
   const obsDates = [...new Set(OBS.map(o => o.date))].sort();
   $("status").textContent = !ISSUES.length
-    ? "No forecasts archived yet. The first one will appear after the evening GitHub Action runs."
+    ? "No forecasts archived yet. The first one will appear after the nightly GitHub Action runs."
     : `${ISSUES.length} forecast${ISSUES.length > 1 ? "s" : ""} archived (${ISSUES[0]} to ${ISSUES[ISSUES.length - 1]}) · ${PSAS.length} PSAs · ` +
       `${obsDates.length} days of observed weather checked · ${LTG.length} lightning days confirmed · ${FIRES.length} fires recorded`;
   initEditor();
+  initExport();
+  initMap();
+  initAnalysis();
 
   $("issueSel").innerHTML = [...ISSUES].reverse().map(d => `<option value="${d}">${fmtDay(d)} (${d})</option>`).join("");
   $("psaSel").innerHTML = PSAS.map(p => `<option>${p}</option>`).join("");
