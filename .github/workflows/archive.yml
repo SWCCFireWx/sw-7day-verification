@@ -2,16 +2,17 @@ name: Archive 7-Day Fire Potential
 
 on:
   schedule:
-    # Times are UTC. The forecast is issued between 7 am and 12 pm Mountain,
-    # so the archive is pulled at about 6 pm Mountain, year-round:
-    #   00:05 UTC = 6:05 pm MDT (summer)  -> runs
-    #             = 5:05 pm MST (winter)  -> skipped by the 6 pm check
-    #   01:05 UTC = 6:05 pm MST (winter)  -> runs
-    #             = 7:05 pm MDT (summer)  -> already archived, skipped
-    #   03:05 UTC = backup at 8-9 pm, only saves if both earlier runs failed
-    - cron: "5 0 * * *"
-    - cron: "5 1 * * *"
-    - cron: "5 3 * * *"
+    # Times are UTC. Runs at about 3 am Mountain (New Mexico) time, year-round.
+    # The forecast is issued 7 am - 12 pm, so a 3 am pull saves the previous day's
+    # forecast under that day's issue date, after it has been finalized.
+    #   09:05 UTC = 3:05 am MDT (summer)  -> runs
+    #             = 2:05 am MST (winter)  -> skipped by the 3 am check
+    #   10:05 UTC = 3:05 am MST (winter)  -> runs
+    #             = 4:05 am MDT (summer)  -> already archived, skipped
+    #   12:05 UTC = backup at 5-6 am, only saves if both earlier runs failed
+    - cron: "5 9 * * *"
+    - cron: "5 10 * * *"
+    - cron: "5 12 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -45,8 +46,9 @@ jobs:
         continue-on-error: true
         run: |
           ARGS=""
-          # Scheduled runs wait for 6 pm Mountain; manual runs go any time.
-          if [ "${{ github.event_name }}" = "schedule" ]; then ARGS="--not-before-hour 18"; fi
+          # Scheduled runs wait for 3 am Mountain; manual runs go any time.
+          # Any run before 7 am Mountain saves the previous day's forecast.
+          if [ "${{ github.event_name }}" = "schedule" ]; then ARGS="--not-before-hour 3"; fi
           if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
           python scripts/archive_forecast.py $ARGS
 
