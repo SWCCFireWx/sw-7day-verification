@@ -116,6 +116,50 @@
              box-shadow: 0 4px 18px rgba(0,0,0,.12); }
   .savebar.clean { position: static; box-shadow: none; }
   .err { color: var(--warn); font-size: 13px; }
+  /* scorecard */
+  .controls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; }
+  .ctl { display: flex; flex-direction: column; gap: 4px; }
+  .ctl label { font-size: 12px; }
+  .summary { font-size: 15.5px; line-height: 1.6; margin: 0; }
+  .summary b { font-family: "IBM Plex Mono", monospace; }
+  .card h2 + .note { margin-top: 2px; }
+  .chartgrid table.num td:first-child { white-space: nowrap; }
+  .chartwrap { position: relative; margin: 14px 0 6px; }
+  .chartwrap svg { display: block; width: 100%; max-width: 640px; height: auto; overflow: visible; }
+  .ctl select, .ctl input { height: 34px; box-sizing: border-box; }
+  .chartgrid { display: grid; grid-template-columns: minmax(0, 600px) minmax(0, 1fr); gap: 8px 28px; align-items: center; }
+  @media (max-width: 1000px) { .chartgrid { grid-template-columns: 1fr; } }
+  .chartwrap .ax { fill: var(--muted); font: 12px "IBM Plex Sans", sans-serif; }
+  .chartwrap .val { fill: var(--ink); font: 600 12px "IBM Plex Mono", monospace; }
+  .chartwrap .grid { stroke: var(--line); stroke-width: 1; }
+  .chartwrap .base { stroke: var(--muted); stroke-width: 1; }
+  .chartwrap .hit { fill: transparent; cursor: default; }
+  .chartwrap .col:hover .seg, .chartwrap .col:focus .seg { filter: brightness(1.08); }
+  .tip { position: absolute; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+         border-radius: 6px; padding: 7px 10px; font-size: 12.5px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0,0,0,.15);
+         white-space: nowrap; opacity: 0; transition: opacity .1s; z-index: 5; }
+  .tip b { font-family: "IBM Plex Mono", monospace; }
+  .keyrow { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+  .keyrow span { display: inline-flex; align-items: center; gap: 6px; }
+  .kev { width: 14px; height: 14px; border-radius: 3px; background: var(--ink); }
+  .kno { width: 14px; height: 14px; border-radius: 3px; background: var(--ink); opacity: .28; }
+  table.num tr.total td { font-weight: 600; border-top: 2px solid var(--line); }
+  table.ct { border-collapse: separate; border-spacing: 4px; }
+  table.ct th { font-size: 12.5px; }
+  table.ct td.cell { width: 150px; padding: 10px 12px; border-radius: 6px; text-align: left; background: var(--bg); border: 1px solid var(--line); }
+  table.ct td.cell b { display: block; font: 600 20px "IBM Plex Mono", monospace; }
+  table.ct td.cell small { color: var(--muted); font-size: 12px; }
+  table.ct td.cell.good b { color: var(--good); } table.ct td.cell.warn b { color: var(--warn); }
+  .two { display: grid; grid-template-columns: auto 1fr; gap: 18px 28px; align-items: start; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .subtabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+  .subtabs button { font: 500 13px "IBM Plex Sans", sans-serif; background: var(--panel); color: var(--muted); border: 1px solid var(--line);
+                    border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  .subtabs button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .subtabs button.ov { font-weight: 600; }
+  table.num tr.click { cursor: pointer; } table.num tr.click:hover td { background: var(--bg); }
+  details.more summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  details.more[open] summary { margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -193,28 +237,30 @@
 </section>
 
 <section id="score">
-  <div class="card">
-    <div class="row">
-      <label for="evtDef">Count a forecast &ldquo;yes&rdquo; when</label>
-      <select id="evtDef">
-        <option value="hr">High Risk (W, B or L)</option>
-        <option value="hrvd">High Risk or Moderate Risk</option>
-      </select>
-      <label for="obsDef">Verify against</label>
+  <div class="card controls">
+    <div class="ctl"><label for="obsDef">Verify against</label>
       <select id="obsDef">
         <option value="fire">Significant fires</option>
         <option value="wx">Observed High Risk weather</option>
         <option value="either">Fire or High Risk weather</option>
-      </select>
-    </div>
-    <div class="row">
-      <label for="minAcres">Fires of at least</label>
-      <input id="minAcres" type="number" min="0" value="0" style="width:90px"> <label>acres</label>
-      <label for="scoreFrom">From</label><input id="scoreFrom" type="date">
-      <label for="scoreTo">to</label><input id="scoreTo" type="date">
-    </div>
-    <div id="scoreBody"></div>
+      </select></div>
+    <div class="ctl"><label for="scLead">Forecast</label>
+      <select id="scLead">
+        <option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option>
+        <option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option><option value="7">Day 7</option>
+      </select></div>
+    <div class="ctl"><label for="evtDef">A &ldquo;yes&rdquo; forecast is</label>
+      <select id="evtDef">
+        <option value="hrvd" selected>High Risk or Moderate Risk</option>
+        <option value="hr">High Risk only (W, B or L)</option>
+      </select></div>
+    <div class="ctl"><label for="scoreFrom">From</label><input id="scoreFrom" type="date"></div>
+    <div class="ctl"><label for="scoreTo">To</label><input id="scoreTo" type="date"></div>
+    <div class="ctl" id="acresCtl"><label for="minAcres">Fires of at least</label>
+      <span><input id="minAcres" type="number" min="0" value="0" style="width:90px"> <span class="note">acres</span></span></div>
   </div>
+  <div class="subtabs" id="scTabs"></div>
+  <div id="scoreBody"></div>
 </section>
 
 <section id="criteria">
@@ -411,7 +457,7 @@ function renderWeather() {
   const hr = pairs.filter(p => p.f).length, obsDays = pairs.filter(p => p.ob.observed).length;
   const pct = (a, b) => b ? Math.round(a / b * 100) + "%" : "–";
   let h = `<div class="stats">
-    <div class="stat"><small>High Risk forecasts</small><b>${hr}</b><small>PSA-days on Day ${lead}</small></div>
+    <div class="stat"><small>High Risk forecasts</small><b>${hr}</b><small>PSA forecasts on Day ${lead}</small></div>
     <div class="stat"><small>Criteria met</small><b class="good">${pct(cnt("verified"), hr)}</b><small>${cnt("verified")} of ${hr} matched the forecast trigger</small></div>
     <div class="stat"><small>Different trigger</small><b class="info">${cnt("other")}</b><small>High Risk, but another trigger was observed</small></div>
     <div class="stat"><small>Criteria not met</small><b class="warn">${cnt("notmet")}</b><small>High Risk with no trigger observed${cnt("possible") ? ` (+${cnt("possible")} unconfirmed)` : ""}</small></div>
@@ -422,7 +468,7 @@ function renderWeather() {
   // breakdown table: forecast type vs observed
   const rowsT = ["W", "B", "L", "WB", ""];
   const colsO = [["W", "Wind met"], ["B", "Burn met"], ["L", "Lightning confirmed"], ["none", "Nothing met"]];
-  h += `<h3>Forecast vs. observed (Day ${lead})</h3><div class="scroll"><table class="num"><tr><th>Forecast</th><th>PSA-days</th>${colsO.map(c => `<th>${c[1]}</th>`).join("")}</tr>`;
+  h += `<h3>Forecast vs. observed (Day ${lead})</h3><div class="scroll"><table class="num"><tr><th>Forecast</th><th>PSA forecasts</th>${colsO.map(c => `<th>${c[1]}</th>`).join("")}</tr>`;
   for (const t of rowsT) {
     const sub = pairs.filter(p => p.f === t);
     if (!sub.length && t === "WB") continue;
@@ -468,12 +514,21 @@ function renderWeather() {
 }
 
 // ------------------------------------------------------------------ scorecard
+let SC_PSA = "";   // "" = overview, else a PSA code
+function renderScoreTabs() {
+  $("scTabs").innerHTML = `<button type="button" class="ov ${SC_PSA ? "" : "on"}" data-p="">Overview</button>` +
+    PSAS.map(p => `<button type="button" class="${SC_PSA === p ? "on" : ""}" data-p="${p}">${p}</button>`).join("");
+  $("scTabs").querySelectorAll("button").forEach(b => b.onclick = () => { SC_PSA = b.dataset.p; renderScore(); });
+}
 function renderScore() {
+  renderScoreTabs();
+  const psaSel = SC_PSA;
   const out = $("scoreBody");
-  const def = $("evtDef").value, obsDef = $("obsDef").value;
+  const def = $("evtDef").value, obsDef = $("obsDef").value, lead = +$("scLead").value;
   const minA = +$("minAcres").value || 0;
   const from = $("scoreFrom").value || "0000", to = $("scoreTo").value || "9999";
   const today = todayMT();
+  $("acresCtl").style.display = obsDef === "wx" ? "none" : "";
 
   const fireObs = new Set(FIRES.filter(f => (+f.acres || 0) >= minA).map(f => f.psa.toUpperCase() + "|" + f.date));
   const wxObs = new Set(OBS.filter(o => o.observed).map(o => o.psa + "|" + o.date));
@@ -481,53 +536,153 @@ function renderScore() {
   const isEvent = k => obsDef === "fire" ? fireObs.has(k) : obsDef === "wx" ? wxObs.has(k) : (fireObs.has(k) || wxObs.has(k));
   const yes = r => trigOf(r) ? true : (def === "hrvd" && r.dryness_code === "3");
 
-  const scored = FC.filter(r => r.valid_date < today && r.valid_date >= from && r.valid_date <= to && r.dryness_code !== "0"
+  const scoredAll = FC.filter(r => r.valid_date < today && r.valid_date >= from && r.valid_date <= to && r.dryness_code !== "0"
     && (obsDef === "fire" || wxChecked.has(r.psa + "|" + r.valid_date)));
+  const scored = psaSel ? scoredAll.filter(r => r.psa === psaSel) : scoredAll;
+  // units: on a PSA tab every forecast is one day; on the overview each is one PSA on one day
+  const U = psaSel ? "days" : "PSA forecasts", u1 = psaSel ? "day" : "PSA forecast";
   if (!scored.length) {
-    out.innerHTML = `<div class="empty">Nothing to score yet. ${obsDef === "fire" ? "Scores appear once archived forecast days are in the past." : "Weather scores appear once past forecast days have been checked against observations."}</div>`; return;
+    out.innerHTML = `<div class="card"><div class="empty">Nothing to score yet. ${obsDef === "fire" ? "Scores appear once archived forecast days are in the past." : "Weather scores appear once past forecast days have been checked against observations."}</div></div>`; return;
   }
-  const evName = { fire: "fire days", wx: "days with High Risk weather", either: "fire or High Risk weather days" }[obsDef];
+  const evWord = { fire: "a significant fire", wx: "High Risk weather", either: "a fire or High Risk weather" }[obsDef];
+  const evShort = { fire: "Fire", wx: "High Risk weather", either: "Fire or HR weather" }[obsDef];
 
+  // ---- tallies
   const L = {}; for (let l = 1; l <= 7; l++) L[l] = { a: 0, b: 0, c: 0, d: 0 };
-  const catCount = {}; CAT_ORDER.concat(["WB"]).forEach(k => catCount[k] = { n: 0, f: 0 });
-  const evKeys = new Set();
+  const cat = {}; CAT_ORDER.concat(["WB"]).forEach(k => cat[k] = { n: 0, f: 0 });
   for (const r of scored) {
     const k = r.psa + "|" + r.valid_date, o = isEvent(k), f = yes(r), s = L[+r.lead_day];
-    if (o) evKeys.add(k);
     if (f && o) s.a++; else if (f) s.b++; else if (o) s.c++; else s.d++;
-    if (+r.lead_day === 1) { const c = catCount[keyOf(r)]; if (c) { c.n++; if (o) c.f++; } }
+    if (+r.lead_day === lead) { const c = cat[keyOf(r)]; if (c) { c.n++; if (o) c.f++; } }
   }
-  const pct = x => isFinite(x) ? (x * 100).toFixed(0) + "%" : "–";
+  const pct = x => isFinite(x) ? Math.round(x * 100) + "%" : "–";
   const num = x => isFinite(x) ? x.toFixed(2) : "–";
   const m = s => ({ pod: s.a / (s.a + s.c), far: s.b / (s.a + s.b), csi: s.a / (s.a + s.b + s.c), bias: (s.a + s.b) / (s.a + s.c) });
-  const d1 = m(L[1]);
+  const S = L[lead], X = m(S), yesN = S.a + S.b, evN = S.a + S.c;
+  const days = [...new Set(scored.filter(r => +r.lead_day === lead).map(r => r.valid_date))].sort();
+  const nPsa = new Set(scored.filter(r => +r.lead_day === lead).map(r => r.psa)).size;
+  const yesLabel = def === "hr" ? "High Risk" : "High Risk or Moderate Risk";
 
-  let h = `<div class="stats">
-    <div class="stat"><small>Day 1 POD</small><b>${pct(d1.pod)}</b><small>${evName} caught</small></div>
-    <div class="stat"><small>Day 1 FAR</small><b>${pct(d1.far)}</b><small>yes forecasts with no event</small></div>
-    <div class="stat"><small>Day 1 CSI</small><b>${num(d1.csi)}</b><small>overall skill on event days</small></div>
-    <div class="stat"><small>Day 1 bias</small><b>${num(d1.bias)}</b><small>&gt;1 = over-forecasting</small></div>
-    <div class="stat"><small>Event days</small><b>${evKeys.size}</b><small>PSA-${evName}</small></div>
-  </div>`;
-  h += `<h3>Skill by lead time</h3><div class="scroll"><table class="num"><tr><th>Lead</th><th>Pairs</th><th>Hits</th><th>Misses</th><th>False alarms</th><th>POD</th><th>FAR</th><th>CSI</th><th>Bias</th><th></th></tr>`;
-  for (let l = 1; l <= 7; l++) {
-    const s = L[l], x = m(s), n = s.a + s.b + s.c + s.d;
-    h += `<tr><td>Day ${l}</td><td>${n}</td><td>${s.a}</td><td>${s.c}</td><td>${s.b}</td><td>${pct(x.pod)}</td><td>${pct(x.far)}</td><td>${num(x.csi)}</td><td>${num(x.bias)}</td>
-      <td><span class="bar" style="width:${isFinite(x.csi) ? Math.round(x.csi * 120) : 0}px"></span></td></tr>`;
-  }
-  h += `</table></div>`;
-  h += `<h3>How often ${evName} followed each Day 1 category</h3><div class="scroll"><table class="num"><tr><th>Day 1 forecast</th><th>PSA-days</th><th>With event</th><th>Rate</th><th></th></tr>`;
-  const keys = CAT_ORDER.filter(k => k !== "0").concat(catCount["WB"].n ? ["WB"] : []);
-  const maxRate = Math.max(...keys.map(k => catCount[k].n ? catCount[k].f / catCount[k].n : 0), 0.0001);
+  // ---- 1. plain-language summary
+  if (!days.length) { out.innerHTML = `<div class="card"><div class="empty">No Day ${lead} forecasts have reached their valid date yet in this range. Try Day 1.</div></div>`; return; }
+  const scope = psaSel
+    ? `<b>${days.length}</b> day${days.length === 1 ? "" : "s"} checked for <b>${psaSel}</b>`
+    : `<b>${days.length}</b> day${days.length === 1 ? "" : "s"} checked &times; <b>${nPsa}</b> PSAs = <b>${S.a + S.b + S.c + S.d}</b> PSA forecasts`;
+  let h = `<div class="card"><p class="summary">
+    ${scope} (${fmtDay(days[0])}${days.length > 1 ? " to " + fmtDay(days[days.length - 1]) : ""}, Day ${lead} forecast).<br>
+    ${yesLabel} was forecast on <b>${yesN}</b> ${yesN === 1 ? u1 : U}; <b>${S.a}</b> had ${evWord}${yesN ? ` (<b>${pct(S.a / yesN)}</b> verified)` : ""}.
+    ${evWord[0].toUpperCase() + evWord.slice(1)} occurred on <b>${evN}</b> ${evN === 1 ? u1 : U}${evN ? `; <b>${S.a}</b> of those were forecast (<b>${pct(X.pod)}</b> caught)` : ""}.
+  </p></div>`;
+
+  // ---- 2. bar chart + table by issued category
+  const keys = CAT_ORDER.filter(k => k !== "0").concat(cat.WB.n ? ["WB"] : []);
+  const FILL = { "1": "var(--green)", "2": "var(--yellow)", "3": "var(--brown)", W: "var(--orange)", B: "var(--orange)", WB: "var(--orange)", L: "var(--red)" };
+  const SHORT = { "1": ["Little or", "No Risk"], "2": ["Low", "Risk"], "3": ["Moderate", "Risk"], W: ["High Risk", "Wind (W)"], B: ["High Risk", "Burn (B)"], L: ["High Risk", "Lightning (L)"], WB: ["High Risk", "W or B"] };
+  const W = 640, H = 300, padL = 40, padR = 10, padT = 28, padB = 58, ph = H - padT - padB;
+  const maxN = Math.max(1, ...keys.map(k => cat[k].n));
+  const step = Math.pow(10, Math.floor(Math.log10(maxN))), nice = [1, 2, 2.5, 5, 10].map(f => f * step).find(v => maxN / v <= 5) || step * 10;
+  const top = Math.ceil(maxN / nice) * nice, y = v => padT + ph - v / top * ph;
+  const slot = (W - padL - padR) / keys.length, bw = Math.min(64, slot * 0.56);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Day ${lead} forecasts by issued category, split by whether ${evWord} occurred">`;
+  for (let v = 0; v <= top; v += nice) svg += `<line class="${v ? "grid" : "base"}" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${padL - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  svg += `<text class="ax" x="0" y="${padT - 14}">${psaSel ? "Days" : "PSA forecasts"}</text>`;
+  keys.forEach((k, i) => {
+    const c = cat[k], cx = padL + slot * i + slot / 2, x0 = cx - bw / 2, base = y(0);
+    const hEv = c.f / top * ph, hNo = (c.n - c.f) / top * ph, gap = c.f && c.n - c.f ? 2 : 0, r = 4;
+    svg += `<g class="col" tabindex="0" data-k="${k}">`;
+    // no-event segment on top (faded), event segment at the base (solid); 4px rounded top on the topmost segment
+    if (c.n - c.f) {
+      const yt = base - hEv - gap - hNo, hh = Math.max(hNo, 0);
+      svg += `<path class="seg" fill="${FILL[k]}" fill-opacity=".32" stroke="${FILL[k]}" stroke-opacity=".9" stroke-width="1" d="M${x0},${yt + hh} V${yt + Math.min(r, hh)} Q${x0},${yt} ${x0 + r},${yt} H${x0 + bw - r} Q${x0 + bw},${yt} ${x0 + bw},${yt + Math.min(r, hh)} V${yt + hh} Z"/>`;
+    }
+    if (c.f) {
+      const yt = base - hEv, rr = c.n - c.f ? 0 : Math.min(r, hEv);
+      svg += `<path class="seg" fill="${FILL[k]}" d="M${x0},${base} V${yt + rr} Q${x0},${yt} ${x0 + rr},${yt} H${x0 + bw - rr} Q${x0 + bw},${yt} ${x0 + bw},${yt + rr} V${base} Z"/>`;
+    }
+    if (c.n) svg += `<text class="val" x="${cx}" y="${y(c.n) - 8}" text-anchor="middle">${pct(c.f / c.n)}</text>`;
+    svg += `<text class="ax" x="${cx}" y="${H - padB + 18}" text-anchor="middle">${SHORT[k][0]}</text><text class="ax" x="${cx}" y="${H - padB + 33}" text-anchor="middle">${SHORT[k][1]}</text>`;
+    svg += `<text class="ax" x="${cx}" y="${H - padB + 50}" text-anchor="middle" style="font-size:11px">n=${c.n}</text>`;
+    svg += `<rect class="hit" x="${padL + slot * i}" y="${padT - 20}" width="${slot}" height="${ph + 20}"/></g>`;
+  });
+  svg += `</svg>`;
+
+  let tbl = `<table class="num"><tr><th>Issued as</th><th>${psaSel ? "Days" : "PSA forecasts"}</th><th>${esc(evShort)}</th><th>None</th><th>Rate</th></tr>`;
+  let tn = 0, tf = 0;
   for (const k of keys) {
-    const c = catCount[k], r = c.n ? c.f / c.n : NaN;
-    h += `<tr><td><i class="sw ${CAT[k].cls}" style="margin-right:8px">${CAT[k].letter === "!" ? "!" : CAT[k].letter}</i>${CAT[k].label}</td><td>${c.n}</td><td>${c.f}</td><td>${pct(r)}</td>
-      <td><span class="bar" style="width:${isFinite(r) ? Math.round(r / maxRate * 120) : 0}px"></span></td></tr>`;
+    const c = cat[k]; tn += c.n; tf += c.f;
+    tbl += `<tr><td><i class="sw ${CAT[k].cls}" style="margin-right:8px">${CAT[k].letter === "!" ? "!" : CAT[k].letter}</i>${CAT[k].label}</td><td>${c.n}</td><td>${c.f}</td><td>${c.n - c.f}</td><td>${pct(c.f / c.n)}</td></tr>`;
+  }
+  tbl += `<tr class="total"><td>All categories</td><td>${tn}</td><td>${tf}</td><td>${tn - tf}</td><td>${pct(tf / tn)}</td></tr></table>`;
+
+  h += `<div class="card"><h2>What was issued, and how often ${evWord} followed</h2>
+    <p class="note">${psaSel || "All PSAs"}, Day ${lead} forecasts, one column per risk category. The percentage is how often ${evWord} occurred in that category; it should rise from left to right.</p>
+    <div class="keyrow" style="margin-top:10px"><span><i class="kev"></i>${esc(evShort)} occurred</span><span><i class="kno"></i>No ${obsDef === "fire" ? "fire" : "event"}</span></div>
+    <div class="chartgrid"><div class="chartwrap" id="scChart">${svg}<div class="tip" id="scTip"></div></div>
+    <div class="scroll">${tbl}</div></div></div>`;
+
+  // ---- 3. hits & misses
+  h += `<div class="card"><h2>Hits and misses (Day ${lead})</h2>
+    <p class="note">Every ${u1} sorted by what was forecast and what happened. A &ldquo;yes&rdquo; forecast is ${yesLabel}.</p>
+    <div class="two" style="margin-top:12px">
+      <div class="scroll"><table class="ct">
+        <tr><th></th><th>${esc(evShort)} occurred</th><th>Nothing happened</th></tr>
+        <tr><th style="text-align:right">Forecast yes</th>
+          <td class="cell good"><b>${S.a}</b><small>Hits</small></td><td class="cell warn"><b>${S.b}</b><small>False alarms</small></td></tr>
+        <tr><th style="text-align:right">Forecast no</th>
+          <td class="cell warn"><b>${S.c}</b><small>Misses</small></td><td class="cell"><b>${S.d}</b><small>Correct quiet days</small></td></tr>
+      </table></div>
+      <table class="num">
+        <tr><th>Score</th><th>Day ${lead}</th><th style="text-align:left">What it means</th></tr>
+        <tr><td>Events caught (POD)</td><td>${pct(X.pod)}</td><td style="font-family:inherit;text-align:left" class="note">share of event days that were forecast yes; higher is better</td></tr>
+        <tr><td>False alarms (FAR)</td><td>${pct(X.far)}</td><td style="font-family:inherit;text-align:left" class="note">share of yes forecasts with no event; lower is better</td></tr>
+        <tr><td>Skill (CSI)</td><td>${num(X.csi)}</td><td style="font-family:inherit;text-align:left" class="note">hits &divide; (hits + misses + false alarms); 1 is perfect</td></tr>
+        <tr><td>Bias</td><td>${num(X.bias)}</td><td style="font-family:inherit;text-align:left" class="note">yes forecasts &divide; event days; above 1 = over-forecasting</td></tr>
+      </table>
+    </div></div>`;
+
+  // ---- 3b. overview only: one row per PSA
+  if (!psaSel) {
+    const per = {};
+    for (const r of scoredAll.filter(r => +r.lead_day === lead)) {
+      const p = per[r.psa] ||= { n: 0, a: 0, b: 0, c: 0 }, o = isEvent(r.psa + "|" + r.valid_date), f = yes(r);
+      p.n++; if (f && o) p.a++; else if (f) p.b++; else if (o) p.c++;
+    }
+    h += `<div class="card"><h2>By PSA (Day ${lead})</h2><p class="note">Click a row to open that PSA's scorecard.</p>
+      <div class="scroll" style="margin-top:10px"><table class="num"><tr><th>PSA</th><th>Days checked</th><th>Yes forecasts</th><th>Hits</th><th>Misses</th><th>False alarms</th><th>Events caught</th><th>Skill (CSI)</th></tr>` +
+      Object.keys(per).sort().map(p => { const q = per[p], x = m({ ...q, d: 0 });
+        return `<tr class="click" data-open="${p}"><td>${p}</td><td>${q.n}</td><td>${q.a + q.b}</td><td>${q.a}</td><td>${q.c}</td><td>${q.b}</td><td>${pct(x.pod)}</td><td>${num(x.csi)}</td></tr>`; }).join("") +
+      `</table></div></div>`;
+  }
+
+  // ---- 4. by lead time
+  h += `<div class="card"><h2>How skill changes with lead time</h2>
+    <p class="note">The same scores for each forecast day. Day 1 is the morning-of forecast; Day 7 was issued six days earlier.</p>
+    <div class="scroll" style="margin-top:10px"><table class="num"><tr><th>Forecast</th><th>${psaSel ? "Days" : "PSA forecasts"} checked</th><th>Hits</th><th>Misses</th><th>False alarms</th><th>Events caught</th><th>False alarms %</th><th>Skill (CSI)</th><th>Bias</th></tr>`;
+  for (let l = 1; l <= 7; l++) {
+    const s = L[l], x = m(s);
+    h += `<tr style="${l === lead ? "background:var(--bg);font-weight:600" : ""}"><td>Day ${l}</td><td>${s.a + s.b + s.c + s.d}</td><td>${s.a}</td><td>${s.c}</td><td>${s.b}</td><td>${pct(x.pod)}</td><td>${pct(x.far)}</td><td>${num(x.csi)}</td><td>${num(x.bias)}</td></tr>`;
   }
   h += `</table></div>`;
   if (obsDef !== "fire") h += `<p class="note">Lightning counts as observed only on days confirmed in <code>data/lightning.csv</code>.</p>`;
   if (obsDef !== "wx" && !FIRES.length) h += `<p class="note">No fires in <code>data/fires.csv</code> yet. See &ldquo;How it works&rdquo; to add them.</p>`;
+  h += `</div>`;
   out.innerHTML = h;
+  out.querySelectorAll("tr[data-open]").forEach(tr => tr.onclick = () => { SC_PSA = tr.dataset.open; renderScore(); window.scrollTo({ top: $("scTabs").offsetTop - 10, behavior: "smooth" }); });
+
+  // ---- chart hover
+  const wrap = $("scChart"), tip = $("scTip");
+  wrap.querySelectorAll(".col").forEach(g => {
+    const show = e => {
+      const k = g.dataset.k, c = cat[k];
+      tip.innerHTML = `<b>${CAT[k].label}</b><br>Issued on ${c.n} ${c.n === 1 ? u1 : U}<br>${esc(evShort)}: <b>${c.f}</b> &nbsp;No ${obsDef === "fire" ? "fire" : "event"}: <b>${c.n - c.f}</b><br>Rate: <b>${pct(c.f / c.n)}</b>`;
+      const wr = wrap.getBoundingClientRect(), gr = g.getBoundingClientRect();
+      tip.style.opacity = 1;
+      const left = Math.min(Math.max(gr.left - wr.left + gr.width / 2 - tip.offsetWidth / 2, 0), wr.width - tip.offsetWidth);
+      tip.style.left = left + "px"; tip.style.top = Math.max(gr.top - wr.top - tip.offsetHeight + 6, 0) + "px";
+    };
+    g.addEventListener("mouseenter", show); g.addEventListener("focus", show);
+    g.addEventListener("mouseleave", () => tip.style.opacity = 0); g.addEventListener("blur", () => tip.style.opacity = 0);
+  });
 }
 
 // ------------------------------------------------------------------ theme
@@ -778,7 +933,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".legendBox").forEach(el => el.innerHTML = legendHTML());
   $("issueSel").onchange = renderIssue; $("psaSel").onchange = renderEvolution; $("evoRange").onchange = renderEvolution;
   ["wxLead", "wxFrom", "wxTo", "wxPsa"].forEach(id => $(id).oninput = renderWeather);
-  ["evtDef", "obsDef", "minAcres", "scoreFrom", "scoreTo"].forEach(id => $(id).oninput = renderScore);
+  ["evtDef", "obsDef", "scLead", "minAcres", "scoreFrom", "scoreTo"].forEach(id => $(id).oninput = renderScore);
   renderIssue(); renderEvolution(); renderWeather(); renderScore();
 
   try { const t = localStorage.getItem("tab"); if (t) document.querySelector(`nav button[data-tab="${t}"]`)?.click(); } catch {}
