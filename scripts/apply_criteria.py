@@ -12,6 +12,7 @@ workflow to post back on the issue.
 Exit code 0 = applied, 1 = rejected (summary explains why).
 """
 
+import csv
 import json
 import os
 import re
@@ -20,6 +21,7 @@ from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CFG_PATH = os.path.join(ROOT, "config", "criteria.json")
+LTG_PATH = os.path.join(ROOT, "data", "lightning.csv")
 RESULT = os.path.join(ROOT, "criteria_result.md")
 PSA_PREFIX = os.environ.get("PSA_PREFIX", "SW")
 
@@ -122,6 +124,41 @@ def main():
             fail(f"Typical peak max for {psa} = {v:g}°F is outside 40-130.")
         tpm[psa.upper()] = round(v, 1)
 
+    # ---- confirmed lightning days (only the changes are sent, so the link stays short)
+    def ltg_list(key):
+        items = sub.get(key) or []
+        if not isinstance(items, list) or len(items) > 2000:
+            fail(f"The lightning {key.split('_')[1]} list is malformed.")
+        out = []
+        for it in items:
+            d = str((it or {}).get("date", ""))
+            try:
+                dd = date.fromisoformat(d)
+            except ValueError:
+                fail(f"Lightning date '{d}' isn't a valid date.")
+            if dd > date.today():
+                fail(f"Lightning day {d} is in the future.")
+            psa = str(it.get("psa", "")).upper()
+            if not re.fullmatch(PSA_PREFIX + r"\d{1,3}[A-Z]?", psa):
+                fail(f"'{psa}' isn't a {PSA_PREFIX} PSA code.")
+            out.append({"date": d, "psa": psa, "notes": clean_text(it.get("notes"), 200).replace(",", ";")})
+        return out
+    ltg_add, ltg_del = ltg_list("lightning_add"), ltg_list("lightning_remove")
+    ltg_rows = []
+    if os.path.exists(LTG_PATH):
+        with open(LTG_PATH, newline="") as fh:
+            ltg_rows = [r for r in csv.DictReader(fh) if r.get("date") and r.get("psa")]
+    gone = {(r["date"], r["psa"]) for r in ltg_del}
+    keep = {(r["date"], r["psa"].upper()): r for r in ltg_rows if (r["date"], r["psa"].upper()) not in gone}
+    for r in ltg_add:
+        keep[(r["date"], r["psa"])] = r
+    if ltg_add or ltg_del:
+        os.makedirs(os.path.dirname(LTG_PATH), exist_ok=True)
+        with open(LTG_PATH, "w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=["date", "psa", "notes"], extrasaction="ignore")
+            w.writeheader()
+            w.writerows(sorted(keep.values(), key=lambda r: (r["date"], r["psa"])))
+
     # ---- write, keeping everything the website doesn't edit
     with open(CFG_PATH) as fh:
         cfg = json.load(fh)
@@ -136,12 +173,21 @@ def main():
     # ---- summary for the issue comment
     today = date.today().isoformat()
     active = next((e["set"] for e in reversed(sched) if e["from"] <= today), sched[0]["set"])
-    lines = ["**Applied.** The website will show the new criteria within a few minutes.", "",
+    lines = ["**Applied.** The website will show the changes within a few minutes.", "",
              f"- Criteria set in use today: **{active}**",
              f"- Sets: {', '.join(sets)}",
              "- Schedule: " + "; ".join(f"{e['set']} from {e['from']}" for e in sched)]
     if tpm:
         lines.append("- Typical peak max set for: " + ", ".join(f"{k} {v:g}°F" for k, v in tpm.items()))
+    def by_date(items):
+        g = {}
+        for r in items:
+            g.setdefault(r["date"], []).append(r["psa"])
+        return "; ".join(f"{d}: {', '.join(sorted(v))}" for d, v in sorted(g.items()))
+    if ltg_add:
+        lines.append("- Lightning days added: " + by_date(ltg_add))
+    if ltg_del:
+        lines.append("- Lightning days removed: " + by_date(ltg_del))
     with open(RESULT, "w") as fh:
         fh.write("\n".join(lines) + "\n")
     print("\n".join(lines))
