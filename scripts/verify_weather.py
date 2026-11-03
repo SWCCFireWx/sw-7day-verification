@@ -77,6 +77,7 @@ OUT_COLS = [
     "burn_hits", "burn_stations", "haines", "sounding",
     "dry_for_lightning",   # stations with min RH below the lightning RH limit (context only)
     "max_temp_f", "min_rh", "max_wind_mph", "max_gust_mph",
+    "erc", "erc_stations",   # median of station daily max ERC (NFDRS fuel model from config), stations reporting
     "sources_missing", "checked_at_utc",
 ]
 
@@ -139,6 +140,9 @@ def mock_http(url, body):
         qtext = body["query"]
         if "stationMetaData" in qtext:
             name = "fems_stations.json"
+        elif "nfdrsObs" in qtext:
+            start = qtext.split('startDateRange: "')[1][:10]
+            name = f"fems_nfdr_{start}.json"
         else:
             start = qtext.split('startDateTimeRange: "')[1][:10]
             name = f"fems_obs_{start}.json"
@@ -286,6 +290,30 @@ def fetch_raws_obs(d, station_ids):
     return rows
 
 
+def fetch_erc(d, station_ids, fuel_model="Y"):
+    """Daily max observed ERC per station for local day d (FEMS NFDRS outputs)."""
+    out = {}
+    for i in range(0, len(station_ids), 60):
+        chunk = ",".join(str(x) for x in station_ids[i:i + 60])
+        page = 0
+        while True:
+            q = f'''query {{ nfdrsObs(stationIds: "{chunk}", fuelModels: "{fuel_model}", nfdrType: "O",
+                startDateRange: "{d.isoformat()}", endDateRange: "{d.isoformat()}", startHour: 0, endHour: 24,
+                dateTimeFormat: "LocalStationTime", page: {page}, per_page: 5000) {{
+                _metadata {{ page page_count total_count }}
+                data {{ station_id nfdr_date energy_release_component }} }} }}'''
+            d_ = gql(q)["nfdrsObs"]
+            for r in d_.get("data") or []:
+                v = num(r.get("energy_release_component"))
+                if v is not None and 0 <= v < 200:
+                    sid = str(r.get("station_id"))
+                    out[sid] = max(out.get(sid, v), v)
+            page += 1
+            if page >= int((d_.get("_metadata") or {}).get("page_count") or 1):
+                break
+    return out
+
+
 def haines_high(profile):
     """High-elevation Haines from a sounding profile list (pres, tmpc, dwpc)."""
     lv = {}
@@ -412,6 +440,8 @@ def evaluate(d, saved, raws, psas, cfg_all):
                 possible += "B?"
 
         vals = lambda k: [s[k] for s in sts if s[k] is not None]
+        ercs = sorted(v for sid, v in (saved.get("erc") or {}).items() if st_meta.get(sid, {}).get("psa") == psa)
+        erc_med = "" if not ercs else round((ercs[len(ercs) // 2] + ercs[(len(ercs) - 1) // 2]) / 2, 1)
         rows.append({
             "date": d.isoformat(), "psa": psa, "criteria_set": set_name, "raws_reporting": n, "stations_needed": need,
             "observed": observed, "possible": possible,
@@ -421,6 +451,7 @@ def evaluate(d, saved, raws, psas, cfg_all):
             "dry_for_lightning": sum(1 for s in sts if s["minrh"] is not None and s["minrh"] < ltg_rh),
             "max_temp_f": max(vals("maxt"), default=""), "min_rh": min(vals("minrh"), default=""),
             "max_wind_mph": max(vals("maxws"), default=""), "max_gust_mph": max(vals("maxg"), default=""),
+            "erc": erc_med, "erc_stations": len(ercs),
             "sources_missing": " ".join(saved.get("missing", [])),
             "checked_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         })
@@ -495,6 +526,11 @@ def main():
             except Exception as e:
                 print(f"{ds} RAWS: {e}")
                 saved["raws"] = []
+            try:
+                saved["erc"] = fetch_erc(d, [r["station_id"] for r in raws], cfg.get("erc_fuel_model", "Y"))
+            except Exception as e:
+                print(f"{ds} ERC: {e}")
+                saved["erc"], missing = {}, missing + ["erc"]
             saved["haines"] = fetch_haines(d)
             if not saved["haines"]:
                 missing.append("soundings")
