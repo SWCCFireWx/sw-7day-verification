@@ -162,7 +162,10 @@ def main():
     ap.add_argument("--date", help="override issue date YYYY-MM-DD (testing / backfill of a saved raw file)")
     ap.add_argument("--not-before-hour", type=int, default=None,
                     help="skip quietly if the local (Mountain) hour is earlier than this; "
-                         "lets one UTC schedule hit ~6 pm in both MST and MDT")
+                         "lets one UTC schedule hit the same local time in both MST and MDT")
+    ap.add_argument("--issued-by-hour", type=int, default=7,
+                    help="the forecast is issued from this local hour on; a pull earlier in the day is "
+                         "the previous day's forecast and is saved under yesterday's issue date")
     args = ap.parse_args()
 
     now_utc = datetime.now(timezone.utc)
@@ -171,12 +174,15 @@ def main():
         print(f"Local time {local_now:%H:%M %Z} is before {args.not_before_hour}:00; skipping this run.")
         return 0
     pulled_at = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
-    issue = date.fromisoformat(args.date) if args.date else now_utc.astimezone(LOCAL_TZ).date()
+    issue = date.fromisoformat(args.date) if args.date else local_now.date()
+    if not args.date and local_now.hour < args.issued_by_hour:
+        issue -= timedelta(days=1)   # today's forecast isn't out yet; the service still holds yesterday's
+        print(f"Local time {local_now:%H:%M %Z} is before {args.issued_by_hour}:00, so this is the {issue} forecast.")
     issue_s = issue.isoformat()
 
     existing = read_existing()
     if any(r["issue_date"] == issue_s for r in existing) and not args.force:
-        print(f"{issue_s} already archived; keeping the first (morning) pull. Use --force to replace.")
+        print(f"{issue_s} already archived; keeping the first pull. Use --force to replace.")
         return 0
 
     raw_snapshot = {"issue_date": issue_s, "pulled_at_utc": pulled_at, "layers": {}}
