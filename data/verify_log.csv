@@ -10,3 +10,4 @@ date,run_utc,message
 2026-10-31,2026-11-02T23:24:16Z,ok; criteria=Standard; missing=[]; met=none
 2026-11-01,2026-11-02T23:24:19Z,ok; criteria=Standard; missing=[]; met=none
 2026-11-02,2026-11-03T14:59:50Z,ok; criteria=Standard; missing=[]; met=none
+2026-11-03,2026-11-04T09:53:18Z,ok; criteria=Standard; missing=['erc']; met=none
