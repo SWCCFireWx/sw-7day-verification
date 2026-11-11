@@ -1,0 +1,1070 @@
+{
+ "issue_date": "2026-11-10",
+ "pulled_at_utc": "2026-11-11T11:00:17Z",
+ "layers": {
+  "day1": [
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730454,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730397,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730409,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730371,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730450,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730362,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730379,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730368,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730331,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730405,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730406,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730342,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730377,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730421,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc": "Southwest"
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794355200000,
+    "forecastdatapointid": 9730387,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc": "Southwest"
+   }
+  ],
+  "day2": [
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730413
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730350
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730373
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730369
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730432
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730392
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730340
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730452
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730332
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730422
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730416
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730380
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730435
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730364
+   },
+   {
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794441600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest",
+    "forecastdatapointid": 9730394
+   }
+  ],
+  "day3": [
+   {
+    "forecastdatapointid": 9730431,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730402,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730339,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730443,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730461,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730440,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730400,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730418,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730333,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730428,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730366,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730346,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730393,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730382,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730399,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794528000000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest"
+   }
+  ],
+  "day4": [
+   {
+    "forecastdatapointid": 9730458,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730415,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730456,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730411,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730419,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730465,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730348,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730408,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730354,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730427,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730457,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730395,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730414,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730437,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730335,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794614400000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest"
+   }
+  ],
+  "day5": [
+   {
+    "forecastdatapointid": 9730412,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730337,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730370,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730390,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730361,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730433,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730338,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730385,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730420,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730351,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730436,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730423,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730391,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730463,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730460,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794700800000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest"
+   }
+  ],
+  "day6": [
+   {
+    "forecastdatapointid": 9730352,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730453,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730429,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730396,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730424,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730357,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730388,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730359,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730410,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730403,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730381,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730448,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730358,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730343,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730442,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794787200000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest"
+   }
+  ],
+  "day7": [
+   {
+    "forecastdatapointid": 9730425,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW04",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730353,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW05",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730447,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730365,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW07",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730439,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW08",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730376,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW10",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730344,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW11",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730446,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW12",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730445,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW03",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730363,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW06S",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730375,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW09",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730404,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW01",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730426,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW02",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730349,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW14N",
+    "gacc_name": "Southwest"
+   },
+   {
+    "forecastdatapointid": 9730389,
+    "drynesscode": 1,
+    "symbol": null,
+    "timestampdate": 1794873600000,
+    "type": null,
+    "isvalid": 0,
+    "nat_code": "SW13",
+    "gacc_name": "Southwest"
+   }
+  ]
+ }
+}
